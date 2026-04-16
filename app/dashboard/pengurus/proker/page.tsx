@@ -75,6 +75,7 @@ export default function PengurusProkerPage() {
               <select
                 value={selectedBidang}
                 onChange={(e) => setSelectedBidang(e.target.value)}
+                aria-label="Pilih bidang"
                 className="border rounded-md px-3 py-2 text-sm"
                 style={{
                   background: isLight ? '#f9f9f9' : colors.bg,
@@ -147,6 +148,7 @@ export default function PengurusProkerPage() {
                 </Badge>
                 <button
                   onClick={() => handleDelete(item.id)}
+                  aria-label={`Hapus ${item.title}`}
                   className="text-red-500 p-1 rounded hover:bg-red-500/10"
                 >
                   <Trash2 className="w-4 h-4" />

@@ -192,6 +192,7 @@ export default function AdminUsersPage() {
                 <select
                   value={formRole}
                   onChange={(e) => setFormRole(e.target.value as 'MAHASISWA' | 'PENGURUS' | 'ADMIN')}
+                  aria-label="Pilih role"
                   className="w-full border rounded-md px-3 py-2 text-sm"
                   style={inputStyle}
                 >
@@ -205,6 +206,7 @@ export default function AdminUsersPage() {
                 <select
                   value={formBidang}
                   onChange={(e) => setFormBidang(e.target.value)}
+                  aria-label="Pilih bidang"
                   className="w-full border rounded-md px-3 py-2 text-sm"
                   style={inputStyle}
                 >
@@ -262,6 +264,7 @@ export default function AdminUsersPage() {
                 </Badge>
                 <button
                   onClick={() => openEdit(user)}
+                  aria-label={`Edit ${user.name}`}
                   className="p-1.5 rounded hover:opacity-70"
                   style={{ color: colors.textSecondary }}
                 >
@@ -269,6 +272,7 @@ export default function AdminUsersPage() {
                 </button>
                 <button
                   onClick={() => handleDelete(user.id)}
+                  aria-label={`Hapus ${user.name}`}
                   className="p-1.5 rounded text-red-500 hover:bg-red-500/10"
                 >
                   <Trash2 className="w-4 h-4" />

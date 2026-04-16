@@ -93,6 +93,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button
               className="lg:hidden p-1 rounded"
               onClick={() => setSidebarOpen(false)}
+              aria-label="Tutup sidebar"
               style={{ color: colors.textSecondary }}
             >
               <X className="w-5 h-5" />
@@ -185,6 +186,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button
             className="lg:hidden p-1.5 rounded-lg"
             onClick={() => setSidebarOpen(true)}
+            aria-label="Buka sidebar"
             style={{ color: colors.textSecondary }}
           >
             <Menu className="w-5 h-5" />

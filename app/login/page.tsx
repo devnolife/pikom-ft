@@ -133,6 +133,7 @@ export default function LoginPage() {
               <select
                 onChange={(e) => handleDevSelect(e.target.value)}
                 defaultValue=""
+                aria-label="Pilih akun dev untuk quick login"
                 className="w-full px-3 py-2 rounded-md text-sm border cursor-pointer"
                 style={{
                   background: isLight ? '#fff' : colors.bgAlt,

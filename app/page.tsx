@@ -459,6 +459,7 @@ export default function Page() {
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                 {pimpinanInti.map((item, i) => (
                   <button key={i} onClick={() => setActiveSlide(i)}
+                    aria-label={`Lihat ${item.title}`}
                     className={`relative w-11 h-11 rounded-md overflow-hidden border-2 transition-all duration-300 ${i === activeSlide ? 'scale-110' : 'border-transparent opacity-50 hover:opacity-80'
                       }`}
                     style={{ borderColor: i === activeSlide ? colors.accent : 'transparent' }}>
