@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MAHASISWA
+  PENGURUS
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  nim       String   @unique
+  name      String
+  password  String
+  role      Role     @default(MAHASISWA)
+  bidang    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  progress Progress[]
+}
+
+model Progress {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  status    String   @default("belum")
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProfilOrganisasi {
+  id          String @id @default(cuid())
+  key         String @unique
+  value       String
+  updatedAt   DateTime @updatedAt
+}
+
+model Proker {
+  id          String   @id @default(cuid())
+  bidang      String
+  title       String
+  status      String   @default("direncanakan")
+  deskripsi   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
