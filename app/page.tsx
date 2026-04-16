@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
-import { motion, useMotionValue, useSpring, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Network, Users, FlaskConical, Flower2, Landmark,
   BookOpen, TrendingUp, HeartHandshake, Palette, Radio,
@@ -22,6 +22,13 @@ const pimpinanInti = [
   { title: "Bendahara 2", role: "Keuangan Eksternal", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop&crop=face" },
 ];
 
+const pengurusSebelumnya = [
+  { periode: "2024–2025", ketua: "Ahmad Fauzi", foto: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=300&fit=crop&crop=face" },
+  { periode: "2023–2024", ketua: "Muhammad Rizki", foto: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&h=300&fit=crop&crop=face" },
+  { periode: "2022–2023", ketua: "Andi Pratama", foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face" },
+  { periode: "2021–2022", ketua: "Ilham Saputra", foto: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face" },
+];
+
 const bidangData = [
   { name: "Organisasi", icon: Network, desc: "Diarahkan pada tercapainya struktur, fungsi dan stabilitas organisasi serta mekanisme kepemimpinan yang mantap. Program konsolidasi gerakan IMM diarahkan pada terciptanya kekuatan gerak IMM baik kedalam maupun keluar sebagai modal penggerak." },
   { name: "Kader", icon: Users, desc: "Diarahkan pada penguatan tri kompetensi dasar (aqidah, intelektual dan humanitas) yang secara dinamis mampu menempatkan diri sebagai pelaku perubahan sosial masyarakat dan ikatan." },
@@ -36,16 +43,10 @@ const bidangData = [
 ];
 
 const geometricShapes = [
-  { size: 60, x: '10%', y: '20%', delay: 0, duration: 8, type: 'circle' as const },
-  { size: 40, x: '85%', y: '15%', delay: 1, duration: 10, type: 'diamond' as const },
-  { size: 30, x: '70%', y: '60%', delay: 2, duration: 7, type: 'circle' as const },
-  { size: 50, x: '20%', y: '75%', delay: 0.5, duration: 9, type: 'triangle' as const },
-  { size: 25, x: '50%', y: '30%', delay: 3, duration: 11, type: 'diamond' as const },
-  { size: 45, x: '90%', y: '80%', delay: 1.5, duration: 8, type: 'circle' as const },
-  { size: 35, x: '40%', y: '90%', delay: 2.5, duration: 10, type: 'triangle' as const },
-  { size: 20, x: '75%', y: '45%', delay: 0.8, duration: 12, type: 'diamond' as const },
-  { size: 55, x: '5%', y: '50%', delay: 1.2, duration: 9, type: 'circle' as const },
-  { size: 28, x: '60%', y: '10%', delay: 2, duration: 7, type: 'triangle' as const },
+  { size: 50, x: '10%', y: '20%', type: 'circle' as const, animClass: 'animate-float' },
+  { size: 35, x: '85%', y: '15%', type: 'diamond' as const, animClass: 'animate-float-reverse' },
+  { size: 40, x: '20%', y: '75%', type: 'triangle' as const, animClass: 'animate-float' },
+  { size: 30, x: '70%', y: '60%', type: 'circle' as const, animClass: 'animate-float-reverse' },
 ];
 
 const statsData = [
@@ -107,14 +108,8 @@ export default function Page() {
   const [activeSection, setActiveSection] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
-  const [cursorHover, setCursorHover] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
-
-  const cursorX = useMotionValue(0);
-  const cursorY = useMotionValue(0);
-  const springX = useSpring(cursorX, { stiffness: 300, damping: 30 });
-  const springY = useSpring(cursorY, { stiffness: 300, damping: 30 });
   const statsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -125,15 +120,6 @@ export default function Page() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
-    };
-    window.addEventListener('mousemove', onMouseMove);
-    return () => window.removeEventListener('mousemove', onMouseMove);
-  }, [cursorX, cursorY]);
 
   useEffect(() => {
     const sections = document.querySelectorAll('section[id]');
@@ -164,35 +150,11 @@ export default function Page() {
     setTimeout(() => setAnnouncement(''), 3000);
   };
 
-  const handleTilt = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    e.currentTarget.style.transform = `perspective(800px) rotateX(${y * -10}deg) rotateY(${x * 10}deg) scale3d(1.03, 1.03, 1.03)`;
-  };
-
-  const resetTilt = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-  };
-
   const ThemeIcon = themeIcons[theme];
 
   return (
     <div className="min-h-screen font-sans overflow-x-hidden grain transition-colors duration-500"
       style={{ backgroundColor: colors.bg, color: colors.text }}>
-
-      {/* Custom Cursor */}
-      <motion.div
-        className="fixed pointer-events-none z-[200] hidden md:block"
-        style={{ left: springX, top: springY }}
-      >
-        <motion.div
-          className="rounded-full -translate-x-1/2 -translate-y-1/2"
-          style={{ borderWidth: 1, borderStyle: 'solid', borderColor: colors.cursorBorder }}
-          animate={{ width: cursorHover ? 56 : 24, height: cursorHover ? 56 : 24 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        />
-      </motion.div>
 
       {/* ARIA Live Region */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
@@ -202,7 +164,7 @@ export default function Page() {
       {/* ── Navigation ── */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'py-3 px-6 md:px-8 glass-strong shadow-lg shadow-black/20' : 'py-6 px-6 md:px-8 bg-transparent'
         }`}>
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
+        <div className="flex justify-between items-center max mx-auto">
           <a href="#about" className="flex items-center gap-4">
             <div className="flex h-8 w-6 rounded-b-md overflow-hidden shadow-lg" style={{ border: `1px solid ${colors.border}` }}>
               <div className="w-1/3 h-full bg-black" />
@@ -221,8 +183,6 @@ export default function Page() {
                 href={link.href}
                 className="relative py-1 transition-colors"
                 style={{ color: activeSection === link.href.slice(1) ? colors.accent : colors.textSecondary }}
-                onMouseEnter={() => setCursorHover(true)}
-                onMouseLeave={() => setCursorHover(false)}
               >
                 {link.label}
                 {activeSection === link.href.slice(1) && (
@@ -231,14 +191,18 @@ export default function Page() {
               </a>
             ))}
 
+            <Link href="/login"
+              className="glass px-5 py-2 uppercase text-[11px] font-bold tracking-[0.15em] transition-all hover:scale-105"
+              style={{ borderColor: colors.accent, color: colors.text }}>
+              Login
+            </Link>
+
             {/* Theme Switcher */}
             <div className="relative">
               <button
                 onClick={() => setThemeMenuOpen(!themeMenuOpen)}
                 className="glass p-2 rounded-full transition-all hover:scale-110"
                 aria-label="Ganti tema"
-                onMouseEnter={() => setCursorHover(true)}
-                onMouseLeave={() => setCursorHover(false)}
               >
                 <ThemeIcon size={14} />
               </button>
@@ -310,38 +274,34 @@ export default function Page() {
                 {link.label}
               </a>
             ))}
-            <button
-              onClick={() => { handleAction('Membuka formulir pendaftaran...'); setMobileMenuOpen(false); }}
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)}
               className="mt-8 glass px-8 py-3 uppercase tracking-[0.2em] text-sm transition-all"
-            >
-              Gabung
-            </button>
+              style={{ color: colors.text }}>
+              Login
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* ── Hero Section ── */}
       <section id="about" className="min-h-screen flex flex-col lg:flex-row items-center justify-between px-6 md:px-16 pt-32 pb-20 relative gap-12">
-        {/* Animated gradient blobs */}
-        <div className="absolute top-1/4 right-10 w-72 h-72 rounded-full filter blur-[120px] opacity-20 animate-blob" style={{ background: `linear-gradient(to bottom right, ${colors.accent}, ${colors.accentSecondary})` }} />
-        <div className="absolute bottom-1/4 left-10 w-56 h-56 rounded-full filter blur-[100px] opacity-15 animate-blob" style={{ background: `linear-gradient(to top right, ${colors.accent}, ${colors.accentSecondary})`, animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/3 w-96 h-96 rounded-full filter blur-[150px] opacity-20 animate-blob" style={{ background: `linear-gradient(to bottom, ${colors.accent}1A, transparent)`, animationDelay: '4s' }} />
+        {/* Gradient blobs */}
+        <div className="absolute top-1/4 right-10 w-64 h-64 rounded-full filter blur-[80px] opacity-15" style={{ background: `linear-gradient(to bottom right, ${colors.accent}, ${colors.accentSecondary})` }} />
+        <div className="absolute bottom-1/4 left-10 w-48 h-48 rounded-full filter blur-[80px] opacity-10" style={{ background: `linear-gradient(to top right, ${colors.accent}, ${colors.accentSecondary})` }} />
 
         {/* Floating geometric shapes */}
         {geometricShapes.map((shape, i) => (
-          <motion.div
+          <div
             key={i}
-            className="absolute pointer-events-none opacity-[0.07]"
+            className={`absolute pointer-events-none opacity-[0.07] ${shape.animClass}`}
             style={{ left: shape.x, top: shape.y }}
-            animate={{ y: [0, -20, 10, -5, 0], rotate: [0, 90, 180, 270, 360] }}
-            transition={{ duration: shape.duration, delay: shape.delay, repeat: Infinity, ease: 'easeInOut' }}
           >
             {shape.type === 'circle' && <div className="rounded-full" style={{ width: shape.size, height: shape.size, border: `1px solid ${colors.text}` }} />}
             {shape.type === 'diamond' && <div className="rotate-45" style={{ width: shape.size, height: shape.size, border: `1px solid ${colors.accent}` }} />}
             {shape.type === 'triangle' && (
               <div style={{ width: 0, height: 0, borderLeft: `${shape.size / 2}px solid transparent`, borderRight: `${shape.size / 2}px solid transparent`, borderBottom: `${shape.size}px solid ${colors.accent}4D` }} />
             )}
-          </motion.div>
+          </div>
         ))}
 
         {/* Hero Text */}
@@ -356,19 +316,15 @@ export default function Page() {
           </div>
 
           <h1 className="text-6xl md:text-[90px] lg:text-[120px] font-black tracking-tighter leading-[0.85] uppercase mb-8">
-            {'Pikom'.split('').map((char, i) => (
-              <motion.span key={`p-${i}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.06, duration: 0.5 }} className="inline-block">
-                {char}
-              </motion.span>
-            ))}
+            <motion.span initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }} className="inline-block">
+              Pikom
+            </motion.span>
             <br />
-            {'Teknik'.split('').map((char, i) => (
-              <motion.span key={`t-${i}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 + i * 0.06, duration: 0.5 }} className="inline-block text-gradient">
-                {char}
-              </motion.span>
-            ))}
+            <motion.span initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }} className="inline-block text-gradient">
+              Teknik
+            </motion.span>
           </h1>
 
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.8 }}
@@ -381,7 +337,7 @@ export default function Page() {
             <a href="#struktur"
               className="group px-8 py-4 uppercase text-[11px] font-bold tracking-[0.2em] transition-all flex items-center gap-2 rounded-sm"
               style={{ backgroundColor: colors.accent, color: colors.selectionText }}
-              onMouseEnter={() => setCursorHover(true)} onMouseLeave={() => setCursorHover(false)}>
+>
               Jelajahi Struktur <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </a>
           </motion.div>
@@ -397,26 +353,34 @@ export default function Page() {
           <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-lg" style={{ background: `linear-gradient(to bottom right, ${colors.accent}, ${colors.accentSecondary})` }} />
           <div className="relative w-full h-full overflow-hidden rounded-lg" style={{ border: `1px solid ${colors.border}`, backgroundColor: colors.bgAlt }}>
             <Image src="https://picsum.photos/seed/teknik/1920/1080" alt="Mahasiswa Teknik" fill
-              className="object-cover hover:scale-105 transition-all duration-700" referrerPolicy="no-referrer" />
+              className="object-cover hover:scale-[1.02] transition-transform duration-300" referrerPolicy="no-referrer" />
             <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${colors.bgAlt}99, transparent)` }} />
           </div>
         </motion.div>
 
         {/* Scroll Indicator */}
-        <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }}
-          className="absolute bottom-8 left-6 md:left-16 flex items-center gap-4 text-[11px] uppercase tracking-[0.2em] font-mono" style={{ color: colors.textMuted }}>
+        <div className="absolute bottom-8 left-6 md:left-16 flex items-center gap-4 text-[11px] uppercase tracking-[0.2em] font-mono animate-float" style={{ color: colors.textMuted }}>
           <ChevronDown size={16} />
           <span>Scroll</span>
           <div className="w-12 h-[1px]" style={{ backgroundColor: colors.border }} />
-        </motion.div>
+        </div>
+      </section>
 
-        {/* Stats Counter — inside hero */}
-        <div ref={statsRef} className="absolute bottom-24 right-6 md:right-16 z-10 flex gap-8 md:gap-12">
-          {statsData.map((stat, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4 + i * 0.15 }}>
-              <StatItem value={stat.value} label={stat.label} suffix={stat.suffix} isVisible={statsVisible} />
-            </motion.div>
+      {/* ── Stats Marquee ── */}
+      <section ref={statsRef} className="overflow-hidden py-5" style={{ borderTop: `1px solid ${colors.border}`, borderBottom: `1px solid ${colors.border}`, backgroundColor: colors.bgAlt }}>
+        <div className="flex animate-marquee whitespace-nowrap">
+          {[...Array(4)].map((_, repeat) => (
+            <div key={repeat} className="flex items-center shrink-0">
+              {statsData.map((stat, i) => (
+                <span key={`${repeat}-${i}`} className="flex items-center gap-3 mx-8 text-[13px] uppercase tracking-[0.2em] font-mono">
+                  <span className="text-2xl md:text-3xl font-black text-gradient">
+                    {statsVisible ? stat.value : 0}{stat.suffix || ''}
+                  </span>
+                  <span style={{ color: colors.textMuted }}>{stat.label}</span>
+                  <span className="ml-8 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colors.accent }} />
+                </span>
+              ))}
+            </div>
           ))}
         </div>
       </section>
@@ -452,13 +416,11 @@ export default function Page() {
               <div className="flex items-center gap-3">
                 <button onClick={() => setActiveSlide((prev) => (prev - 1 + pimpinanInti.length) % pimpinanInti.length)}
                   className="glass p-2.5 rounded-full transition-all"
-                  onMouseEnter={() => setCursorHover(true)} onMouseLeave={() => setCursorHover(false)}
                   aria-label="Sebelumnya">
                   <ChevronLeft size={18} />
                 </button>
                 <button onClick={() => setActiveSlide((prev) => (prev + 1) % pimpinanInti.length)}
                   className="glass p-2.5 rounded-full transition-all"
-                  onMouseEnter={() => setCursorHover(true)} onMouseLeave={() => setCursorHover(false)}
                   aria-label="Berikutnya">
                   <ChevronRight size={18} />
                 </button>
@@ -509,6 +471,44 @@ export default function Page() {
         </div>
       </section>
 
+      {/* ── Pengurus Sebelumnya ── */}
+      <section className="py-20 px-6 md:px-16" style={{ backgroundColor: colors.bgAlt, borderBottom: `1px solid ${colors.border}` }}>
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }} transition={{ duration: 0.6 }}
+            className="mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase mb-3">
+              Pengurus <span className="text-gradient">Sebelumnya</span>
+            </h2>
+            <p className="font-mono text-sm max-w-lg" style={{ color: colors.textMuted }}>
+              Jejak kepemimpinan PIKOM Fakultas Teknik dari masa ke masa.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {pengurusSebelumnya.map((item, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                className="group glass rounded-xl overflow-hidden text-center"
+              >
+                <div className="relative w-full aspect-square overflow-hidden">
+                  <Image src={item.foto} alt={item.ketua} fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${colors.bgAlt}, transparent 60%)` }} />
+                </div>
+                <div className="p-4 -mt-8 relative z-10">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] px-2 py-0.5 rounded-full glass inline-block mb-2" style={{ color: colors.accent }}>
+                    {item.periode}
+                  </span>
+                  <h3 className="font-bold text-sm uppercase tracking-tight">{item.ketua}</h3>
+                  <p className="text-[11px] font-mono" style={{ color: colors.textMuted }}>Ketua Umum</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Bidang-Bidang (Bento Grid) ── */}
       <section id="bidang" className="py-32 px-6 md:px-16">
         <div className="max-w-7xl mx-auto">
@@ -538,13 +538,11 @@ export default function Page() {
                   viewport={{ once: true }}
                   transition={{ delay: (index % 4) * 0.1 }}
                   className="group relative glass rounded-2xl overflow-hidden gradient-border hover:shadow-[0_0_40px_rgba(255,215,0,0.12)] transition-all duration-500 flex flex-col justify-between h-full"
-                  onMouseEnter={() => setCursorHover(true)}
-                  onMouseLeave={() => setCursorHover(false)}
                 >
                   {/* Background Image */}
                   <div className="absolute inset-0 z-0">
                     <Image src={`https://picsum.photos/seed/${seed}/800/800`} alt={bidang.name} fill
-                      className="object-cover brightness-100 saturate-100 opacity-40 group-hover:scale-110 group-hover:opacity-50 transition-all duration-700"
+                      className="object-cover brightness-100 saturate-100 opacity-40 group-hover:scale-105 group-hover:opacity-50 transition-all duration-300"
                       referrerPolicy="no-referrer" />
                     <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${colors.cardOverlay}, transparent)` }} />
                   </div>
@@ -582,8 +580,8 @@ export default function Page() {
 
       {/* ── Footer CTA ── */}
       <footer className="py-32 px-6 md:px-16 text-center relative overflow-hidden" style={{ borderTop: `1px solid ${colors.border}`, backgroundColor: colors.bgAlt }}>
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full filter blur-[120px] animate-blob" style={{ background: `linear-gradient(to bottom right, ${colors.accent}33, transparent)` }} />
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full filter blur-[80px]" style={{ background: `linear-gradient(to bottom right, ${colors.accent}33, transparent)` }} />
         </div>
 
         <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }}
@@ -598,8 +596,6 @@ export default function Page() {
           <button
             onClick={() => handleAction('Membuka halaman kontak...')}
             className="group glass px-12 py-5 uppercase text-[13px] font-bold tracking-[0.2em] transition-all"
-            onMouseEnter={() => setCursorHover(true)}
-            onMouseLeave={() => setCursorHover(false)}
           >
             Hubungi Kami
           </button>
@@ -625,8 +621,6 @@ export default function Page() {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="fixed bottom-8 right-8 z-50 glass p-4 rounded-full transition-all group"
             aria-label="Scroll ke atas"
-            onMouseEnter={() => setCursorHover(true)}
-            onMouseLeave={() => setCursorHover(false)}
           >
             <ArrowUp size={20} className="group-hover:-translate-y-0.5 transition-transform" />
           </motion.button>

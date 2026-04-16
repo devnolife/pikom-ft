@@ -16,20 +16,24 @@ const themeIcons: Record<ThemeKey, typeof Sun> = {
   dark: Moon,
 };
 
+const devAccounts = [
+  { label: 'Admin', nim: 'ADMIN001', password: 'admin123' },
+  { label: 'Pengurus', nim: 'PENGURUS001', password: 'pengurus123' },
+  { label: 'Mahasiswa', nim: '2024001', password: 'mhs123' },
+];
+
 export default function LoginPage() {
   const { colors, theme, setTheme, isLight } = useTheme();
   const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [nim, setNim] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const nim = formData.get('nim') as string;
-    const password = formData.get('password') as string;
 
     if (!nim || !password) {
       setError('NIM dan password wajib diisi');
@@ -51,6 +55,14 @@ export default function LoginPage() {
 
     router.push('/dashboard');
     router.refresh();
+  };
+
+  const handleDevSelect = (value: string) => {
+    const account = devAccounts.find((a) => a.nim === value);
+    if (account) {
+      setNim(account.nim);
+      setPassword(account.password);
+    }
   };
 
   const cycleTheme = () => {
@@ -113,6 +125,30 @@ export default function LoginPage() {
           </CardHeader>
 
           <CardContent>
+            {/* Dev Quick Login */}
+            <div className="mb-5 p-3 rounded-lg" style={{ background: `${colors.accent}10`, border: `1px dashed ${colors.accent}40` }}>
+              <label className="text-[10px] uppercase tracking-widest font-mono block mb-2" style={{ color: colors.accent }}>
+                Dev — Quick Login
+              </label>
+              <select
+                onChange={(e) => handleDevSelect(e.target.value)}
+                defaultValue=""
+                className="w-full px-3 py-2 rounded-md text-sm border cursor-pointer"
+                style={{
+                  background: isLight ? '#fff' : colors.bgAlt,
+                  borderColor: colors.border,
+                  color: colors.text,
+                }}
+              >
+                <option value="" disabled>Pilih akun...</option>
+                {devAccounts.map((acc) => (
+                  <option key={acc.nim} value={acc.nim}>
+                    {acc.label} — {acc.nim}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="nim" style={{ color: colors.textSecondary }}>
@@ -124,6 +160,8 @@ export default function LoginPage() {
                   type="text"
                   placeholder="Masukkan NIM"
                   required
+                  value={nim}
+                  onChange={(e) => setNim(e.target.value)}
                   className="border"
                   style={{
                     background: isLight ? '#fff' : colors.bgAlt,
@@ -143,6 +181,8 @@ export default function LoginPage() {
                   type="password"
                   placeholder="Masukkan password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="border"
                   style={{
                     background: isLight ? '#fff' : colors.bgAlt,
