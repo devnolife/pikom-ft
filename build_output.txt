@@ -20,3 +20,30 @@
  Γ£ô Generating static pages (14/14)
    Finalizing page optimization ...
    Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+Γöî Γùï /                                     9.9 kB         162 kB
+Γö£ Γùï /_not-found                            994 B         103 kB
+Γö£ ╞Æ /api/auth/[...nextauth]                131 B         102 kB
+Γö£ ╞Æ /bidang/[slug]                       6.01 kB         158 kB
+Γö£ ╞Æ /dashboard                             131 B         102 kB
+Γö£ Γùï /dashboard/admin                     3.69 kB         117 kB
+Γö£ ╞Æ /dashboard/admin/proker                131 B         102 kB
+Γö£ Γùï /dashboard/admin/users               23.9 kB         147 kB
+Γö£ Γùï /dashboard/mahasiswa                 4.77 kB         125 kB
+Γö£ ╞Æ /dashboard/mahasiswa/progress          131 B         102 kB
+Γö£ Γùï /dashboard/pengurus                  3.59 kB         117 kB
+Γö£ Γùï /dashboard/pengurus/kader            3.23 kB         115 kB
+Γö£ Γùï /dashboard/pengurus/proker           3.13 kB         129 kB
+Γöö Γùï /login                               4.85 kB         125 kB
++ First Load JS shared by all             102 kB
+  Γö£ chunks/255-842f13cb89d91771.js       45.8 kB
+  Γö£ chunks/4bd1b696-21f374d1156f834a.js  54.2 kB
+  Γöö other shared chunks (total)          1.93 kB
+
+
+╞Æ Middleware                              146 kB
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

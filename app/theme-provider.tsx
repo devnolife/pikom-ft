@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 
 export type ThemeKey = 'classic' | 'light' | 'dark';
 
-interface ThemeColors {
+export interface ThemeColors {
   bg: string;
   bgAlt: string;
   accent: string;
@@ -34,40 +34,40 @@ const themes: Record<ThemeKey, ThemeColors> = {
     accentSecondary: '#FFA500',
     accentHover: '#FFFFFF',
     text: '#FFFFFF',
-    textSecondary: 'rgba(255,255,255,0.7)',
-    textMuted: 'rgba(255,255,255,0.5)',
-    border: 'rgba(255,255,255,0.1)',
+    textSecondary: 'rgba(255,255,255,0.82)',
+    textMuted: 'rgba(255,255,255,0.68)',
+    border: 'rgba(255,255,255,0.12)',
     selection: '#FFD700',
     selectionText: '#3A0914',
     gradientFrom: '#FFD700',
     gradientTo: '#FFA500',
-    glassOverlay: 'rgba(255,255,255,0.05)',
+    glassOverlay: 'rgba(255,255,255,0.06)',
     cardOverlay: '#3A0914',
     cursorBorder: 'rgba(255,215,0,0.5)',
-    mobileMenuBg: 'rgba(58,9,20,0.95)',
+    mobileMenuBg: 'rgba(58,9,20,0.97)',
     scrollbarTrack: '#3A0914',
     scrollbarThumb: '#FFD700',
   },
   light: {
     bg: '#FAFAFA',
     bgAlt: '#FFFFFF',
-    accent: '#C41E3A',
-    accentSecondary: '#FFD700',
-    accentHover: '#8A1525',
-    text: '#1A1A1A',
-    textSecondary: '#555555',
-    textMuted: '#888888',
-    border: 'rgba(0,0,0,0.08)',
-    selection: '#C41E3A',
+    accent: '#8A1525',
+    accentSecondary: '#C41E3A',
+    accentHover: '#3A0914',
+    text: '#17181A',
+    textSecondary: '#2D2F33',
+    textMuted: '#55595F',
+    border: 'rgba(23,24,26,0.1)',
+    selection: '#8A1525',
     selectionText: '#FFFFFF',
-    gradientFrom: '#C41E3A',
-    gradientTo: '#C41E3A',
-    glassOverlay: 'rgba(0,0,0,0.03)',
-    cardOverlay: '#F0F0F0',
-    cursorBorder: 'rgba(196,30,58,0.5)',
+    gradientFrom: '#8A1525',
+    gradientTo: '#8A1525',
+    glassOverlay: 'rgba(255,255,255,0.72)',
+    cardOverlay: '#F4F4F4',
+    cursorBorder: 'rgba(138,21,37,0.5)',
     mobileMenuBg: 'rgba(250,250,250,0.97)',
-    scrollbarTrack: '#F0F0F0',
-    scrollbarThumb: '#C41E3A',
+    scrollbarTrack: '#ECECEC',
+    scrollbarThumb: '#8A1525',
   },
   dark: {
     bg: '#0A0A0A',
@@ -76,14 +76,14 @@ const themes: Record<ThemeKey, ThemeColors> = {
     accentSecondary: '#FFD700',
     accentHover: '#FFFFFF',
     text: '#F5F5F5',
-    textSecondary: 'rgba(255,255,255,0.6)',
-    textMuted: 'rgba(255,255,255,0.4)',
-    border: 'rgba(255,255,255,0.08)',
+    textSecondary: 'rgba(255,255,255,0.82)',
+    textMuted: 'rgba(255,255,255,0.66)',
+    border: 'rgba(255,255,255,0.1)',
     selection: '#E3000F',
     selectionText: '#FFFFFF',
     gradientFrom: '#E3000F',
     gradientTo: '#FFD700',
-    glassOverlay: 'rgba(255,255,255,0.04)',
+    glassOverlay: 'rgba(255,255,255,0.05)',
     cardOverlay: '#141414',
     cursorBorder: 'rgba(227,0,15,0.5)',
     mobileMenuBg: 'rgba(10,10,10,0.97)',
@@ -98,7 +98,7 @@ const themeLabels: Record<ThemeKey, string> = {
   dark: 'Gelap',
 };
 
-interface ThemeContext {
+interface ThemeContextValue {
   theme: ThemeKey;
   colors: ThemeColors;
   setTheme: (t: ThemeKey) => void;
@@ -106,10 +106,10 @@ interface ThemeContext {
   isLight: boolean;
 }
 
-const ThemeContext = createContext<ThemeContext>({
+const ThemeContext = createContext<ThemeContextValue>({
   theme: 'classic',
   colors: themes.classic,
-  setTheme: () => {},
+  setTheme: () => { },
   label: 'Klasik',
   isLight: false,
 });
@@ -119,57 +119,39 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeKey>('classic');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('pikom-theme') as ThemeKey | null;
-    if (saved && themes[saved]) setThemeState(saved);
-    setMounted(true);
-  }, []);
+  const [theme, setThemeState] = useState<ThemeKey>(() => {
+    if (typeof document === 'undefined') return 'classic';
+    const attr = document.documentElement.getAttribute('data-theme') as ThemeKey | null;
+    return attr && attr in themes ? attr : 'classic';
+  });
 
   const setTheme = (t: ThemeKey) => {
     setThemeState(t);
-    localStorage.setItem('pikom-theme', t);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('pikom-theme', t);
+      } catch {
+        /* ignore quota / disabled storage */
+      }
+    }
   };
 
   useEffect(() => {
-    if (!mounted) return;
-    const c = themes[theme];
-    const root = document.documentElement;
-    root.style.setProperty('--color-bg', c.bg);
-    root.style.setProperty('--color-bg-alt', c.bgAlt);
-    root.style.setProperty('--color-accent', c.accent);
-    root.style.setProperty('--color-accent-secondary', c.accentSecondary);
-    root.style.setProperty('--color-accent-hover', c.accentHover);
-    root.style.setProperty('--color-text', c.text);
-    root.style.setProperty('--color-text-secondary', c.textSecondary);
-    root.style.setProperty('--color-text-muted', c.textMuted);
-    root.style.setProperty('--color-border', c.border);
-    root.style.setProperty('--color-selection', c.selection);
-    root.style.setProperty('--color-selection-text', c.selectionText);
-    root.style.setProperty('--color-gradient-from', c.gradientFrom);
-    root.style.setProperty('--color-gradient-to', c.gradientTo);
-    root.style.setProperty('--color-glass-overlay', c.glassOverlay);
-    root.style.setProperty('--color-card-overlay', c.cardOverlay);
-    root.style.setProperty('--color-cursor-border', c.cursorBorder);
-    root.style.setProperty('--color-mobile-menu-bg', c.mobileMenuBg);
-    root.style.setProperty('--color-scrollbar-track', c.scrollbarTrack);
-    root.style.setProperty('--color-scrollbar-thumb', c.scrollbarThumb);
-  }, [theme, mounted]);
-
-  if (!mounted) return null;
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   return (
-    <ThemeContext value={{
-      theme,
-      colors: themes[theme],
-      setTheme,
-      label: themeLabels[theme],
-      isLight: theme === 'light',
-    }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        colors: themes[theme],
+        setTheme,
+        label: themeLabels[theme],
+        isLight: theme === 'light',
+      }}
+    >
       {children}
-    </ThemeContext>
+    </ThemeContext.Provider>
   );
 }
 

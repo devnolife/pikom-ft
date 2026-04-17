@@ -1,4 +1,4 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -25,6 +25,9 @@ const nextConfig: NextConfig = {
     ],
   },
   transpilePackages: ['motion'],
+  experimental: {
+    viewTransition: true,
+  },
 };
 
 export default nextConfig;

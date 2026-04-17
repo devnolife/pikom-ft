@@ -1,20 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useTheme, themeKeys, themeLabels, type ThemeKey } from '@/app/theme-provider';
+import { toast } from 'sonner';
+import { Eye, EyeOff, LogIn, ArrowLeft, Quote, ChevronDown } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sun, Moon, SwatchBook, LogIn, Loader2 } from 'lucide-react';
-
-const themeIcons: Record<ThemeKey, typeof Sun> = {
-  classic: SwatchBook,
-  light: Sun,
-  dark: Moon,
-};
+import { FormField } from '@/components/ui/form-field';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { BrandMark } from '@/components/landing/brand-mark';
+import { DecorativeBlobs } from '@/components/landing/decorative-blobs';
+import { cn } from '@/lib/utils';
 
 const devAccounts = [
   { label: 'Admin', nim: 'ADMIN001', password: 'admin123' },
@@ -22,218 +21,274 @@ const devAccounts = [
   { label: 'Mahasiswa', nim: '2024001', password: 'mhs123' },
 ];
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 export default function LoginPage() {
-  const { colors, theme, setTheme, isLight } = useTheme();
   const router = useRouter();
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [nim, setNim] = useState('');
   const [password, setPassword] = useState('');
+  const [nimError, setNimError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [devOpen, setDevOpen] = useState(false);
+
+  const validate = () => {
+    let ok = true;
+    if (!nim.trim()) {
+      setNimError('NIM wajib diisi');
+      ok = false;
+    } else setNimError('');
+    if (!password) {
+      setPasswordError('Password wajib diisi');
+      ok = false;
+    } else setPasswordError('');
+    return ok;
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
+    if (!validate()) return;
+
     setLoading(true);
-
-    if (!nim || !password) {
-      setError('NIM dan password wajib diisi');
-      setLoading(false);
-      return;
-    }
-
     const result = await signIn('credentials', {
-      nim,
+      nim: nim.trim(),
       password,
       redirect: false,
     });
 
     if (result?.error) {
-      setError('NIM atau password salah');
       setLoading(false);
+      toast.error('Gagal masuk', {
+        description: 'NIM atau password yang Anda masukkan tidak cocok.',
+      });
+      setPasswordError('NIM atau password salah');
       return;
     }
 
+    toast.success('Selamat datang kembali!', {
+      description: 'Mengalihkan ke dashboard...',
+    });
     router.push('/dashboard');
     router.refresh();
   };
 
-  const handleDevSelect = (value: string) => {
-    const account = devAccounts.find((a) => a.nim === value);
-    if (account) {
-      setNim(account.nim);
-      setPassword(account.password);
+  const handleDevSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const acc = devAccounts.find((a) => a.nim === e.target.value);
+    if (acc) {
+      setNim(acc.nim);
+      setPassword(acc.password);
+      setNimError('');
+      setPasswordError('');
     }
   };
 
-  const cycleTheme = () => {
-    const idx = themeKeys.indexOf(theme);
-    setTheme(themeKeys[(idx + 1) % themeKeys.length]);
-  };
-
-  const ThemeIcon = themeIcons[theme];
-
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{ background: `linear-gradient(135deg, ${colors.bg}, ${colors.bgAlt})` }}
-    >
-      {/* Background decorations */}
-      <div
-        className="absolute top-[-20%] right-[-10%] w-96 h-96 rounded-full blur-3xl opacity-20 animate-blob"
-        style={{ background: colors.accent }}
-      />
-      <div
-        className="absolute bottom-[-20%] left-[-10%] w-96 h-96 rounded-full blur-3xl opacity-15 animate-blob"
-        style={{ background: colors.accentSecondary, animationDelay: '2s' }}
-      />
+    <div className="min-h-screen bg-bg text-fg lg:grid lg:grid-cols-[55fr_45fr]">
+      {/* ═══════════════════════════════════════════════════════
+          BRAND PANEL (desktop) / HEADER (mobile)
+          ═══════════════════════════════════════════════════════ */}
+      <aside
+        className="relative overflow-hidden lg:sticky lg:top-0 lg:h-screen flex flex-col justify-between px-6 md:px-10 lg:px-14 py-8 lg:py-12"
+        style={{
+          background:
+            'linear-gradient(135deg, var(--color-brand), var(--color-brand-alt) 60%, var(--color-bg-alt))',
+        }}
+      >
+        <DecorativeBlobs variant="hero" />
 
-      <div className="w-full max-w-md relative z-10">
-        {/* Theme toggle */}
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={cycleTheme}
-            className="p-2 rounded-full glass"
-            style={{ color: colors.accent }}
-            title={`Tema: ${themeLabels[theme]}`}
-          >
-            <ThemeIcon className="w-5 h-5" />
-          </button>
-        </div>
-
-        <Card
-          className="border-0 shadow-2xl"
-          style={{
-            background: isLight ? 'rgba(255,255,255,0.9)' : colors.glassOverlay,
-            backdropFilter: 'blur(20px)',
-            border: `1px solid ${colors.border}`,
-            color: colors.text,
-          }}
-        >
-          <CardHeader className="text-center space-y-2">
-            <div
-              className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-2"
-              style={{ background: `${colors.accent}20` }}
-            >
-              <LogIn className="w-8 h-8" style={{ color: colors.accent }} />
-            </div>
-            <CardTitle className="text-2xl font-bold" style={{ color: colors.text }}>
-              PIKOM FT — IMM
-            </CardTitle>
-            <CardDescription style={{ color: colors.textSecondary }}>
-              Masuk dengan NIM dan password
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            {/* Dev Quick Login */}
-            <div className="mb-5 p-3 rounded-lg" style={{ background: `${colors.accent}10`, border: `1px dashed ${colors.accent}40` }}>
-              <label className="text-[10px] uppercase tracking-widest font-mono block mb-2" style={{ color: colors.accent }}>
-                Dev — Quick Login
-              </label>
-              <select
-                onChange={(e) => handleDevSelect(e.target.value)}
-                defaultValue=""
-                aria-label="Pilih akun dev untuk quick login"
-                className="w-full px-3 py-2 rounded-md text-sm border cursor-pointer"
-                style={{
-                  background: isLight ? '#fff' : colors.bgAlt,
-                  borderColor: colors.border,
-                  color: colors.text,
-                }}
-              >
-                <option value="" disabled>Pilih akun...</option>
-                {devAccounts.map((acc) => (
-                  <option key={acc.nim} value={acc.nim}>
-                    {acc.label} — {acc.nim}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="nim" style={{ color: colors.textSecondary }}>
-                  NIM
-                </Label>
-                <Input
-                  id="nim"
-                  name="nim"
-                  type="text"
-                  placeholder="Masukkan NIM"
-                  required
-                  value={nim}
-                  onChange={(e) => setNim(e.target.value)}
-                  className="border"
-                  style={{
-                    background: isLight ? '#fff' : colors.bgAlt,
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" style={{ color: colors.textSecondary }}>
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Masukkan password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="border"
-                  style={{
-                    background: isLight ? '#fff' : colors.bgAlt,
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
-                />
-              </div>
-
-              {error && (
-                <p className="text-sm text-red-500 text-center">{error}</p>
-              )}
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full font-semibold cursor-pointer"
-                style={{
-                  background: colors.accent,
-                  color: isLight ? '#fff' : colors.bg,
-                }}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Masuk...
-                  </>
-                ) : (
-                  'Masuk'
-                )}
-              </Button>
-            </form>
-
-            <p className="text-center text-xs mt-6" style={{ color: colors.textMuted }}>
-              Hubungi pengurus jika belum memiliki akun
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Back to home */}
-        <div className="text-center mt-4">
-          <a
+        <header className="relative z-10 flex items-center justify-between">
+          <BrandMark />
+          <Link
             href="/"
-            className="text-sm hover:underline"
-            style={{ color: colors.textSecondary }}
+            className="hidden lg:inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] font-mono text-fg-secondary hover:text-fg transition-colors group"
           >
-            ← Kembali ke beranda
-          </a>
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            Beranda
+          </Link>
+        </header>
+
+        {/* Hero content (desktop only) */}
+        <div className="hidden lg:block relative z-10 max-w-md">
+          <span className="inline-flex items-center gap-2 glass px-3 py-1.5 rounded-full text-[11px] font-mono uppercase tracking-[0.2em] text-accent mb-8">
+            <Quote size={12} aria-hidden="true" />
+            Pesan IMM
+          </span>
+          <h1 className="font-black tracking-tighter uppercase leading-[0.95] text-5xl xl:text-6xl mb-6">
+            Anggun dalam <span className="text-gold">Moral</span>,
+            Unggul dalam Intelektual
+          </h1>
+          <p className="text-base font-mono leading-relaxed text-fg-secondary">
+            Masuk ke dashboard PIKOM Fakultas Teknik untuk mengelola program
+            kerja, kader, dan progress Anda.
+          </p>
         </div>
-      </div>
+
+        <footer className="hidden lg:block relative z-10 text-[11px] font-mono uppercase tracking-[0.2em] text-fg-muted">
+          &copy; 2026 PIKOM FT — IMM
+        </footer>
+
+        {/* Mobile compact header */}
+        <div className="lg:hidden relative z-10 mt-4">
+          <p className="text-xs font-mono uppercase tracking-[0.2em] text-fg-muted">
+            Anggun dalam Moral, Unggul dalam Intelektual
+          </p>
+        </div>
+      </aside>
+
+      {/* ═══════════════════════════════════════════════════════
+          FORM PANEL
+          ═══════════════════════════════════════════════════════ */}
+      <main className="relative flex items-center justify-center px-6 md:px-10 py-12 lg:py-16">
+        {/* Top-right theme toggle */}
+        <div className="absolute top-6 right-6">
+          <ThemeToggle />
+        </div>
+
+        <div className="w-full max-w-md">
+          {/* Back link (mobile) */}
+          <Link
+            href="/"
+            className="lg:hidden inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] font-mono text-fg-secondary hover:text-accent transition-colors mb-8"
+          >
+            <ArrowLeft size={14} />
+            Beranda
+          </Link>
+
+          <div className="mb-10">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 glass-strong"
+              aria-hidden="true"
+            >
+              <LogIn size={22} className="text-accent" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight uppercase mb-2">
+              Masuk ke Dashboard
+            </h2>
+            <p className="text-sm font-mono text-fg-secondary">
+              Gunakan NIM dan password yang diberikan pengurus.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
+            <FormField
+              id="nim"
+              label="NIM"
+              helperText="Contoh: 2024001"
+              error={nimError}
+            >
+              <Input
+                type="text"
+                name="nim"
+                autoComplete="username"
+                inputMode="text"
+                autoFocus
+                value={nim}
+                onChange={(e) => {
+                  setNim(e.target.value);
+                  if (nimError) setNimError('');
+                }}
+                placeholder="Masukkan NIM"
+                disabled={loading}
+                className="h-11 bg-surface/60 border-border"
+              />
+            </FormField>
+
+            <FormField
+              id="password"
+              label="Password"
+              error={passwordError}
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => toast.info('Hubungi pengurus untuk reset password')}
+                  className="text-fg-muted hover:text-accent transition-colors font-mono"
+                >
+                  Lupa password?
+                </button>
+              }
+            >
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordError) setPasswordError('');
+                  }}
+                  placeholder="Masukkan password"
+                  disabled={loading}
+                  className="h-11 bg-surface/60 border-border pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-fg-muted hover:text-fg transition-colors"
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </FormField>
+
+            <Button
+              type="submit"
+              loading={loading}
+              className="w-full h-11 rounded-full bg-accent text-[color:var(--color-selection-text)] font-bold uppercase text-xs tracking-[0.2em] hover:opacity-90 transition-opacity"
+            >
+              {loading ? 'Memverifikasi...' : 'Masuk'}
+            </Button>
+          </form>
+
+          {/* Dev quick login */}
+          {isDev && (
+            <div className="mt-8">
+              <button
+                type="button"
+                onClick={() => setDevOpen((v) => !v)}
+                aria-expanded={devOpen}
+                className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.3em] text-fg-muted hover:text-accent transition-colors"
+              >
+                <span className="inline-block w-2 h-2 rounded-full bg-accent animate-pulse" />
+                Dev Quick Login
+                <ChevronDown
+                  size={12}
+                  className={cn('transition-transform', devOpen && 'rotate-180')}
+                />
+              </button>
+              {devOpen && (
+                <div className="mt-3 p-3 rounded-xl glass border border-border">
+                  <label htmlFor="dev-account" className="sr-only">
+                    Pilih akun dev
+                  </label>
+                  <select
+                    id="dev-account"
+                    onChange={handleDevSelect}
+                    defaultValue=""
+                    className="w-full px-3 py-2 rounded-md text-sm bg-surface border border-border text-fg cursor-pointer"
+                  >
+                    <option value="" disabled>
+                      Pilih akun untuk auto-fill...
+                    </option>
+                    {devAccounts.map((acc) => (
+                      <option key={acc.nim} value={acc.nim}>
+                        {acc.label} — {acc.nim}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
+
+          <p className="text-center text-xs text-fg-muted mt-10 font-mono">
+            Hubungi pengurus jika belum memiliki akun
+          </p>
+        </div>
+      </main>
     </div>
   );
 }
