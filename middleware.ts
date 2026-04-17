@@ -23,18 +23,60 @@ export default auth((req) => {
   }
 
   const role = (session.user as { role?: string }).role;
+  const jabatan = (session.user as { jabatan?: string | null }).jabatan ?? null;
 
-  // Role-based route protection
-  if (pathname.startsWith('/dashboard/admin') && role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/dashboard/' + (role || 'mahasiswa').toLowerCase(), req.url));
-  }
-  if (pathname.startsWith('/dashboard/pengurus') && role !== 'PENGURUS' && role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/dashboard/' + (role || 'mahasiswa').toLowerCase(), req.url));
+  const fallback = role === 'ADMIN'
+    ? '/dashboard/admin'
+    : role === 'MAHASISWA'
+      ? '/dashboard/mahasiswa'
+      : '/dashboard';
+
+  // Admin keeps full access
+  if (role === 'ADMIN') {
+    if (pathname === '/dashboard') {
+      return NextResponse.redirect(new URL('/dashboard/admin', req.url));
+    }
+    return NextResponse.next();
   }
 
-  // Redirect /dashboard to role-specific page
+  // Role-based section guards
+  if (pathname.startsWith('/dashboard/admin')) {
+    return NextResponse.redirect(new URL(fallback, req.url));
+  }
+
+  // Jabatan-based section guards (PENGURUS)
+  if (pathname.startsWith('/dashboard/ketua')) {
+    if (role !== 'PENGURUS' || jabatan !== 'KETUA_UMUM') {
+      return NextResponse.redirect(new URL(fallback, req.url));
+    }
+  }
+  if (pathname.startsWith('/dashboard/sekum')) {
+    if (role !== 'PENGURUS' || jabatan !== 'SEKRETARIS_UMUM') {
+      return NextResponse.redirect(new URL(fallback, req.url));
+    }
+  }
+  if (pathname.startsWith('/dashboard/bendahara')) {
+    if (role !== 'PENGURUS' || jabatan !== 'BENDAHARA_UMUM') {
+      return NextResponse.redirect(new URL(fallback, req.url));
+    }
+  }
+  if (pathname.startsWith('/dashboard/pengurus')) {
+    if (role !== 'PENGURUS') {
+      return NextResponse.redirect(new URL(fallback, req.url));
+    }
+    // Only KETUA_BIDANG or ANGGOTA_BIDANG (or KETUA_UMUM for view) may enter
+    const allowed = ['KETUA_BIDANG', 'ANGGOTA_BIDANG', 'KETUA_UMUM'];
+    if (jabatan && !allowed.includes(jabatan)) {
+      return NextResponse.redirect(new URL(fallback, req.url));
+    }
+    // Anggota bidang: no /kader
+    if (jabatan === 'ANGGOTA_BIDANG' && pathname.startsWith('/dashboard/pengurus/kader')) {
+      return NextResponse.redirect(new URL('/dashboard/pengurus/proker', req.url));
+    }
+  }
+
   if (pathname === '/dashboard') {
-    return NextResponse.redirect(new URL('/dashboard/' + (role || 'mahasiswa').toLowerCase(), req.url));
+    return NextResponse.redirect(new URL(fallback, req.url));
   }
 
   return NextResponse.next();

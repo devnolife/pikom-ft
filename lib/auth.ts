@@ -4,6 +4,7 @@ import { compare } from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   providers: [
     Credentials({
       name: 'NIM',
@@ -28,6 +29,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           nim: user.nim,
           role: user.role,
+          jabatan: user.jabatan,
           bidang: user.bidang,
         };
       },
@@ -42,6 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.role = (user as { role: string }).role;
         token.nim = (user as { nim: string }).nim;
+        token.jabatan = (user as { jabatan?: string | null }).jabatan ?? null;
         token.bidang = (user as { bidang?: string }).bidang;
       }
       return token;
@@ -51,6 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub!;
         (session.user as { role: string }).role = token.role as string;
         (session.user as { nim: string }).nim = token.nim as string;
+        (session.user as { jabatan?: string | null }).jabatan = (token.jabatan as string | null) ?? null;
         (session.user as { bidang?: string }).bidang = token.bidang as string | undefined;
       }
       return session;

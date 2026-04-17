@@ -17,7 +17,11 @@ import { cn } from '@/lib/utils';
 
 const devAccounts = [
   { label: 'Admin', nim: 'ADMIN001', password: 'admin123' },
-  { label: 'Pengurus', nim: 'PENGURUS001', password: 'pengurus123' },
+  { label: 'Ketua Umum', nim: 'KETUA001', password: 'ketua123' },
+  { label: 'Sekretaris Umum', nim: 'SEKUM001', password: 'sekum123' },
+  { label: 'Bendahara Umum', nim: 'BENDAHARA001', password: 'bendahara123' },
+  { label: 'Ketua Bidang', nim: 'KETUABID001', password: 'ketuabid123' },
+  { label: 'Anggota Bidang', nim: 'ANGGOTA001', password: 'anggota123' },
   { label: 'Mahasiswa', nim: '2024001', password: 'mhs123' },
 ];
 
@@ -81,6 +85,14 @@ export default function LoginPage() {
       setNimError('');
       setPasswordError('');
     }
+  };
+
+  const fillDevAccount = (acc: (typeof devAccounts)[number]) => {
+    setNim(acc.nim);
+    setPassword(acc.password);
+    setNimError('');
+    setPasswordError('');
+    toast.info(`Auto-fill: ${acc.label}`, { description: acc.nim });
   };
 
   return (
@@ -260,7 +272,7 @@ export default function LoginPage() {
                 />
               </button>
               {devOpen && (
-                <div className="mt-3 p-3 rounded-xl glass border border-border">
+                <div className="mt-3 p-3 rounded-xl glass border border-border space-y-3">
                   <label htmlFor="dev-account" className="sr-only">
                     Pilih akun dev
                   </label>
@@ -279,6 +291,29 @@ export default function LoginPage() {
                       </option>
                     ))}
                   </select>
+                  <div className="border-t border-border pt-3">
+                    <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-fg-muted mb-2">
+                      Daftar akun demo (klik untuk auto-fill)
+                    </p>
+                    <ul className="space-y-1.5">
+                      {devAccounts.map((acc) => (
+                        <li key={acc.nim}>
+                          <button
+                            type="button"
+                            onClick={() => fillDevAccount(acc)}
+                            className="w-full flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-md text-left text-xs hover:bg-glass-overlay transition-colors group"
+                          >
+                            <span className="font-semibold text-fg group-hover:text-accent transition-colors shrink-0">
+                              {acc.label}
+                            </span>
+                            <span className="font-mono text-[11px] text-fg-muted truncate">
+                              {acc.nim} / {acc.password}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               )}
             </div>

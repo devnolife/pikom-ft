@@ -13,17 +13,47 @@ enum Role {
   ADMIN
 }
 
+enum Jabatan {
+  KETUA_UMUM
+  SEKRETARIS_UMUM
+  BENDAHARA_UMUM
+  KETUA_BIDANG
+  ANGGOTA_BIDANG
+}
+
+enum TipeSurat {
+  MASUK
+  KELUAR
+}
+
+enum KategoriAturan {
+  TOR
+  AD_ART
+  SOP
+  LAIN
+}
+
+enum TipeTransaksi {
+  PEMASUKAN
+  PENGELUARAN
+}
+
 model User {
   id        String   @id @default(cuid())
   nim       String   @unique
   name      String
   password  String
   role      Role     @default(MAHASISWA)
+  jabatan   Jabatan?
   bidang    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  progress Progress[]
+  progress    Progress[]
+  prokerMade  Proker[]    @relation("ProkerCreator")
+  suratMade   Surat[]     @relation("SuratCreator")
+  aturanMade  Aturan[]    @relation("AturanCreator")
+  transaksiMade Transaksi[] @relation("TransaksiCreator")
 }
 
 model Progress {
@@ -51,6 +81,55 @@ model Proker {
   title       String
   status      String   @default("direncanakan")
   deskripsi   String?
+  createdById String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  creator User? @relation("ProkerCreator", fields: [createdById], references: [id], onDelete: SetNull)
+}
+
+model Surat {
+  id          String    @id @default(cuid())
+  tipe        TipeSurat
+  nomor       String
+  tanggal     DateTime
+  perihal     String
+  pengirim    String?
+  tujuan      String?
+  lampiranUrl String?
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  creator User? @relation("SuratCreator", fields: [createdById], references: [id], onDelete: SetNull)
+}
+
+model Aturan {
+  id          String         @id @default(cuid())
+  judul       String
+  kategori    KategoriAturan
+  konten      String?
+  lampiranUrl String?
+  createdById String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  creator User? @relation("AturanCreator", fields: [createdById], references: [id], onDelete: SetNull)
+}
+
+model Transaksi {
+  id          String        @id @default(cuid())
+  tipe        TipeTransaksi
+  tanggal     DateTime
+  kategori    String
+  jumlah      Int
+  deskripsi   String?
+  pihak       String?
+  bidang      String?
+  notaUrl     String?
+  createdById String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  creator User? @relation("TransaksiCreator", fields: [createdById], references: [id], onDelete: SetNull)
 }

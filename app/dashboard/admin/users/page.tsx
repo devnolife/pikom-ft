@@ -19,13 +19,29 @@ import { getUsers, createUser, updateUser, deleteUser } from '@/lib/actions/user
 import { bidangDetail } from '@/app/data/bidang';
 import { cn } from '@/lib/utils';
 
+type JabatanValue =
+  | 'KETUA_UMUM'
+  | 'SEKRETARIS_UMUM'
+  | 'BENDAHARA_UMUM'
+  | 'KETUA_BIDANG'
+  | 'ANGGOTA_BIDANG';
+
 type UserRow = {
   id: string;
   nim: string;
   name: string;
   role: string;
+  jabatan: JabatanValue | null;
   bidang: string | null;
   createdAt: Date;
+};
+
+const jabatanLabels: Record<JabatanValue, string> = {
+  KETUA_UMUM: 'Ketua Umum',
+  SEKRETARIS_UMUM: 'Sekretaris Umum',
+  BENDAHARA_UMUM: 'Bendahara Umum',
+  KETUA_BIDANG: 'Ketua Bidang',
+  ANGGOTA_BIDANG: 'Anggota Bidang',
 };
 
 type RoleFilter = 'ALL' | 'ADMIN' | 'PENGURUS' | 'MAHASISWA';
@@ -60,6 +76,7 @@ export default function AdminUsersPage() {
   const [formName, setFormName] = useState('');
   const [formPassword, setFormPassword] = useState('');
   const [formRole, setFormRole] = useState<'MAHASISWA' | 'PENGURUS' | 'ADMIN'>('MAHASISWA');
+  const [formJabatan, setFormJabatan] = useState<JabatanValue | ''>('');
   const [formBidang, setFormBidang] = useState('');
   const [formError, setFormError] = useState('');
 
@@ -88,6 +105,7 @@ export default function AdminUsersPage() {
     setFormName('');
     setFormPassword('');
     setFormRole('MAHASISWA');
+    setFormJabatan('');
     setFormBidang('');
     setFormError('');
     setEditingUser(null);
@@ -104,6 +122,7 @@ export default function AdminUsersPage() {
     setFormName(user.name);
     setFormPassword('');
     setFormRole(user.role as 'MAHASISWA' | 'PENGURUS' | 'ADMIN');
+    setFormJabatan(user.jabatan ?? '');
     setFormBidang(user.bidang || '');
     setFormError('');
     setDialogOpen(true);
@@ -124,17 +143,19 @@ export default function AdminUsersPage() {
 
     setSubmitting(true);
     try {
+      const jabatanValue: JabatanValue | null = formRole === 'PENGURUS' && formJabatan ? formJabatan : null;
       if (editingUser) {
         await updateUser(editingUser.id, {
           name: formName,
           role: formRole,
+          jabatan: jabatanValue,
           bidang: formBidang || undefined,
           password: formPassword || undefined,
         });
         setUsers((prev) =>
           prev.map((u) =>
             u.id === editingUser.id
-              ? { ...u, name: formName, role: formRole, bidang: formBidang || null }
+              ? { ...u, name: formName, role: formRole, jabatan: jabatanValue, bidang: formBidang || null }
               : u
           )
         );
@@ -145,6 +166,7 @@ export default function AdminUsersPage() {
           name: formName,
           password: formPassword,
           role: formRole,
+          jabatan: jabatanValue,
           bidang: formBidang || undefined,
         });
         const fresh = await getUsers();
@@ -262,6 +284,7 @@ export default function AdminUsersPage() {
                   <p className="text-sm font-semibold truncate">{user.name}</p>
                   <p className="text-[11px] font-mono uppercase tracking-widest text-fg-muted truncate">
                     {user.nim}
+                    {user.jabatan && ` · ${jabatanLabels[user.jabatan]}`}
                     {user.bidang && ` · ${user.bidang}`}
                   </p>
                 </div>
@@ -334,7 +357,11 @@ export default function AdminUsersPage() {
               <FormField id="user-role" label="Role">
                 <select
                   value={formRole}
-                  onChange={(e) => setFormRole(e.target.value as typeof formRole)}
+                  onChange={(e) => {
+                    const v = e.target.value as typeof formRole;
+                    setFormRole(v);
+                    if (v !== 'PENGURUS') setFormJabatan('');
+                  }}
                   disabled={submitting}
                   aria-label="Pilih role user"
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
@@ -342,6 +369,26 @@ export default function AdminUsersPage() {
                   <option value="MAHASISWA">Mahasiswa</option>
                   <option value="PENGURUS">Pengurus</option>
                   <option value="ADMIN">Admin</option>
+                </select>
+              </FormField>
+              <FormField
+                id="user-jabatan"
+                label="Jabatan"
+                helperText={formRole === 'PENGURUS' ? 'Khusus pengurus' : 'Hanya untuk role Pengurus'}
+              >
+                <select
+                  value={formJabatan}
+                  onChange={(e) => setFormJabatan(e.target.value as JabatanValue | '')}
+                  disabled={submitting || formRole !== 'PENGURUS'}
+                  aria-label="Pilih jabatan"
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                >
+                  <option value="">— Tanpa jabatan khusus —</option>
+                  <option value="KETUA_UMUM">Ketua Umum</option>
+                  <option value="SEKRETARIS_UMUM">Sekretaris Umum</option>
+                  <option value="BENDAHARA_UMUM">Bendahara Umum</option>
+                  <option value="KETUA_BIDANG">Ketua Bidang</option>
+                  <option value="ANGGOTA_BIDANG">Anggota Bidang</option>
                 </select>
               </FormField>
               <FormField id="user-bidang" label="Bidang (opsional)">

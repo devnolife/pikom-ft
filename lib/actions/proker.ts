@@ -1,18 +1,13 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
-
-async function requirePengurus() {
-  const session = await auth();
-  if (!session?.user) throw new Error('Unauthorized');
-  const role = (session.user as { role: string }).role;
-  if (role !== 'PENGURUS' && role !== 'ADMIN') {
-    throw new Error('Pengurus access required');
-  }
-  return session;
-}
+import {
+  getSessionUser,
+  requireAuth,
+  requireBidangWrite,
+  canEditBidangData,
+} from '@/lib/auth-helpers';
 
 export async function getProkerByBidang(bidang: string) {
   return prisma.proker.findMany({
@@ -32,16 +27,23 @@ export async function createProker(data: {
   title: string;
   deskripsi?: string;
 }) {
-  await requirePengurus();
+  const user = await requireBidangWrite(data.bidang);
 
-  const proker = await prisma.proker.create({ data });
+  const proker = await prisma.proker.create({
+    data: { ...data, createdById: user.id },
+  });
 
   revalidatePath('/dashboard/pengurus');
+  revalidatePath('/dashboard/ketua');
   return proker;
 }
 
 export async function updateProkerStatus(id: string, status: string) {
-  await requirePengurus();
+  await requireAuth();
+  const existing = await prisma.proker.findUnique({ where: { id } });
+  if (!existing) throw new Error('Proker tidak ditemukan');
+
+  await requireBidangWrite(existing.bidang);
 
   const proker = await prisma.proker.update({
     where: { id },
@@ -49,12 +51,23 @@ export async function updateProkerStatus(id: string, status: string) {
   });
 
   revalidatePath('/dashboard/pengurus');
+  revalidatePath('/dashboard/ketua');
   return proker;
 }
 
 export async function deleteProker(id: string) {
-  await requirePengurus();
+  const existing = await prisma.proker.findUnique({ where: { id } });
+  if (!existing) throw new Error('Proker tidak ditemukan');
+
+  await requireBidangWrite(existing.bidang);
 
   await prisma.proker.delete({ where: { id } });
   revalidatePath('/dashboard/pengurus');
+  revalidatePath('/dashboard/ketua');
+}
+
+export async function canEditBidang(bidang: string) {
+  const user = await getSessionUser();
+  if (!user) return false;
+  return canEditBidangData(user, bidang);
 }

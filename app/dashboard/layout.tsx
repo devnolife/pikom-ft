@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import {
-  Home, Users, BarChart3, ClipboardList,
+  Home, Users, BarChart3, ClipboardList, Mail, FileText, Wallet, LayoutDashboard,
 } from 'lucide-react';
 import { Sidebar, type SidebarNavItem } from '@/components/dashboard/sidebar';
 import { Topbar } from '@/components/dashboard/topbar';
@@ -15,46 +15,94 @@ const roleLabels: Record<string, string> = {
   ADMIN: 'Administrator',
 };
 
-function getNavItems(role: string): SidebarNavItem[] {
+const jabatanLabels: Record<string, string> = {
+  KETUA_UMUM: 'Ketua Umum',
+  SEKRETARIS_UMUM: 'Sekretaris Umum',
+  BENDAHARA_UMUM: 'Bendahara Umum',
+  KETUA_BIDANG: 'Ketua Bidang',
+  ANGGOTA_BIDANG: 'Anggota Bidang',
+};
+
+function getNavItems(role: string, jabatan?: string | null): SidebarNavItem[] {
   const base = '/dashboard';
-  switch (role) {
-    case 'ADMIN':
-      return [
-        { href: `${base}/admin`, label: 'Dashboard', icon: Home },
-        { href: `${base}/admin/users`, label: 'Kelola User', icon: Users },
-        { href: `${base}/admin/proker`, label: 'Semua Proker', icon: ClipboardList },
-      ];
-    case 'PENGURUS':
-      return [
-        { href: `${base}/pengurus`, label: 'Dashboard', icon: Home },
-        { href: `${base}/pengurus/proker`, label: 'Program Kerja', icon: ClipboardList },
-        { href: `${base}/pengurus/kader`, label: 'Data Kader', icon: Users },
-      ];
-    default:
-      return [
-        { href: `${base}/mahasiswa`, label: 'Dashboard', icon: Home },
-        { href: `${base}/mahasiswa/progress`, label: 'Progress Saya', icon: BarChart3 },
-      ];
+
+  if (role === 'ADMIN') {
+    return [
+      { href: `${base}/admin`, label: 'Dashboard', icon: Home },
+      { href: `${base}/admin/users`, label: 'Kelola User', icon: Users },
+      { href: `${base}/admin/proker`, label: 'Semua Proker', icon: ClipboardList },
+      { href: `${base}/ketua`, label: 'Ringkasan Komisariat', icon: LayoutDashboard },
+      { href: `${base}/sekum/persuratan`, label: 'Persuratan', icon: Mail },
+      { href: `${base}/sekum/aturan`, label: 'TOR & Aturan', icon: FileText },
+      { href: `${base}/bendahara`, label: 'Keuangan', icon: Wallet },
+    ];
   }
+
+  if (role === 'PENGURUS') {
+    switch (jabatan) {
+      case 'KETUA_UMUM':
+        return [
+          { href: `${base}/ketua`, label: 'Ringkasan', icon: LayoutDashboard },
+          { href: `${base}/pengurus/proker`, label: 'Proker Semua Bidang', icon: ClipboardList },
+          { href: `${base}/ketua/persuratan`, label: 'Persuratan', icon: Mail },
+          { href: `${base}/ketua/aturan`, label: 'TOR & Aturan', icon: FileText },
+          { href: `${base}/ketua/keuangan`, label: 'Keuangan', icon: Wallet },
+        ];
+      case 'SEKRETARIS_UMUM':
+        return [
+          { href: `${base}/sekum/persuratan`, label: 'Persuratan', icon: Mail },
+          { href: `${base}/sekum/aturan`, label: 'TOR & Aturan', icon: FileText },
+        ];
+      case 'BENDAHARA_UMUM':
+        return [
+          { href: `${base}/bendahara`, label: 'Kas & Keuangan', icon: Wallet },
+        ];
+      case 'KETUA_BIDANG':
+        return [
+          { href: `${base}/pengurus`, label: 'Dashboard Bidang', icon: Home },
+          { href: `${base}/pengurus/proker`, label: 'Program Kerja', icon: ClipboardList },
+          { href: `${base}/pengurus/kader`, label: 'Data Kader', icon: Users },
+        ];
+      case 'ANGGOTA_BIDANG':
+      default:
+        return [
+          { href: `${base}/pengurus`, label: 'Dashboard Bidang', icon: Home },
+          { href: `${base}/pengurus/proker`, label: 'Kegiatan Kerja', icon: ClipboardList },
+        ];
+    }
+  }
+
+  // MAHASISWA
+  return [
+    { href: `${base}/mahasiswa`, label: 'Dashboard', icon: Home },
+    { href: `${base}/mahasiswa/progress`, label: 'Progress Saya', icon: BarChart3 },
+  ];
 }
 
-// Map path → page title (breadcrumb terakhir)
 function getCrumbs(pathname: string, role: string): string[] {
   if (pathname === '/dashboard') return ['Dashboard'];
-  const segments = pathname.split('/').filter(Boolean).slice(1); // drop "dashboard"
+  const segments = pathname.split('/').filter(Boolean).slice(1);
   const first = segments[0];
   const rest = segments.slice(1);
-  const mainLabel = roleLabels[first?.toUpperCase() ?? ''] || (first ?? '');
-  const restLabels = rest.map((s) => {
-    const map: Record<string, string> = {
-      users: 'Kelola User',
-      proker: 'Program Kerja',
-      kader: 'Data Kader',
-      progress: 'Progress',
-    };
-    return map[s] || s.charAt(0).toUpperCase() + s.slice(1);
-  });
-  // void role param (reserved for future)
+  const areaLabels: Record<string, string> = {
+    admin: 'Administrator',
+    pengurus: 'Pengurus',
+    mahasiswa: 'Mahasiswa',
+    ketua: 'Ketua Umum',
+    sekum: 'Sekretaris Umum',
+    bendahara: 'Bendahara',
+  };
+  const mainLabel = areaLabels[first ?? ''] || (first ?? '');
+  const map: Record<string, string> = {
+    users: 'Kelola User',
+    proker: 'Program Kerja',
+    kader: 'Data Kader',
+    progress: 'Progress',
+    persuratan: 'Persuratan',
+    aturan: 'TOR & Aturan',
+    keuangan: 'Keuangan',
+  };
+  const restLabels = rest.map((s) => map[s] || s.charAt(0).toUpperCase() + s.slice(1));
   void role;
   return ['Dashboard', mainLabel, ...restLabels].filter(Boolean);
 }
@@ -65,9 +113,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const role = (session?.user as { role?: string } | undefined)?.role || 'MAHASISWA';
+  const jabatan = (session?.user as { jabatan?: string | null } | undefined)?.jabatan ?? null;
   const nim = (session?.user as { nim?: string } | undefined)?.nim;
-  const navItems = getNavItems(role);
+  const navItems = getNavItems(role, jabatan);
   const crumbs = getCrumbs(pathname, role);
+  const roleLabel = jabatan ? jabatanLabels[jabatan] : roleLabels[role] || role;
 
   return (
     <div className="min-h-screen bg-bg text-fg flex">
@@ -76,7 +126,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         user={{
           name: session?.user?.name,
           nim,
-          roleLabel: roleLabels[role] || role,
+          roleLabel,
         }}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -89,3 +139,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
