@@ -28,13 +28,13 @@ function getNavItems(role: string, jabatan?: string | null): SidebarNavItem[] {
 
   if (role === 'ADMIN') {
     return [
-      { href: `${base}/admin`, label: 'Dashboard', icon: Home },
-      { href: `${base}/admin/users`, label: 'Kelola User', icon: Users },
-      { href: `${base}/admin/proker`, label: 'Semua Proker', icon: ClipboardList },
-      { href: `${base}/ketua`, label: 'Ringkasan Komisariat', icon: LayoutDashboard },
-      { href: `${base}/sekum/persuratan`, label: 'Persuratan', icon: Mail },
-      { href: `${base}/sekum/aturan`, label: 'TOR & Aturan', icon: FileText },
-      { href: `${base}/bendahara`, label: 'Keuangan', icon: Wallet },
+      { href: `${base}/admin`, label: 'Dashboard', icon: Home, group: 'Utama' },
+      { href: `${base}/admin/users`, label: 'Kelola User', icon: Users, group: 'Administrasi' },
+      { href: `${base}/admin/proker`, label: 'Semua Proker', icon: ClipboardList, group: 'Administrasi' },
+      { href: `${base}/ketua`, label: 'Ringkasan Komisariat', icon: LayoutDashboard, group: 'Operasional' },
+      { href: `${base}/sekum/persuratan`, label: 'Persuratan', icon: Mail, group: 'Operasional' },
+      { href: `${base}/sekum/aturan`, label: 'TOR & Aturan', icon: FileText, group: 'Operasional' },
+      { href: `${base}/bendahara`, label: 'Keuangan', icon: Wallet, group: 'Operasional' },
     ];
   }
 
@@ -42,40 +42,40 @@ function getNavItems(role: string, jabatan?: string | null): SidebarNavItem[] {
     switch (jabatan) {
       case 'KETUA_UMUM':
         return [
-          { href: `${base}/ketua`, label: 'Ringkasan', icon: LayoutDashboard },
-          { href: `${base}/pengurus/proker`, label: 'Proker Semua Bidang', icon: ClipboardList },
-          { href: `${base}/ketua/persuratan`, label: 'Persuratan', icon: Mail },
-          { href: `${base}/ketua/aturan`, label: 'TOR & Aturan', icon: FileText },
-          { href: `${base}/ketua/keuangan`, label: 'Keuangan', icon: Wallet },
+          { href: `${base}/ketua`, label: 'Ringkasan', icon: LayoutDashboard, group: 'Utama' },
+          { href: `${base}/pengurus/proker`, label: 'Proker Semua Bidang', icon: ClipboardList, group: 'Operasional' },
+          { href: `${base}/ketua/persuratan`, label: 'Persuratan', icon: Mail, group: 'Operasional' },
+          { href: `${base}/ketua/aturan`, label: 'TOR & Aturan', icon: FileText, group: 'Operasional' },
+          { href: `${base}/ketua/keuangan`, label: 'Keuangan', icon: Wallet, group: 'Operasional' },
         ];
       case 'SEKRETARIS_UMUM':
         return [
-          { href: `${base}/sekum/persuratan`, label: 'Persuratan', icon: Mail },
-          { href: `${base}/sekum/aturan`, label: 'TOR & Aturan', icon: FileText },
+          { href: `${base}/sekum/persuratan`, label: 'Persuratan', icon: Mail, group: 'Sekretariat' },
+          { href: `${base}/sekum/aturan`, label: 'TOR & Aturan', icon: FileText, group: 'Sekretariat' },
         ];
       case 'BENDAHARA_UMUM':
         return [
-          { href: `${base}/bendahara`, label: 'Kas & Keuangan', icon: Wallet },
+          { href: `${base}/bendahara`, label: 'Kas & Keuangan', icon: Wallet, group: 'Keuangan' },
         ];
       case 'KETUA_BIDANG':
         return [
-          { href: `${base}/pengurus`, label: 'Dashboard Bidang', icon: Home },
-          { href: `${base}/pengurus/proker`, label: 'Program Kerja', icon: ClipboardList },
-          { href: `${base}/pengurus/kader`, label: 'Data Kader', icon: Users },
+          { href: `${base}/pengurus`, label: 'Dashboard Bidang', icon: Home, group: 'Utama' },
+          { href: `${base}/pengurus/proker`, label: 'Program Kerja', icon: ClipboardList, group: 'Bidang' },
+          { href: `${base}/pengurus/kader`, label: 'Data Kader', icon: Users, group: 'Bidang' },
         ];
       case 'ANGGOTA_BIDANG':
       default:
         return [
-          { href: `${base}/pengurus`, label: 'Dashboard Bidang', icon: Home },
-          { href: `${base}/pengurus/proker`, label: 'Kegiatan Kerja', icon: ClipboardList },
+          { href: `${base}/pengurus`, label: 'Dashboard Bidang', icon: Home, group: 'Utama' },
+          { href: `${base}/pengurus/proker`, label: 'Kegiatan Kerja', icon: ClipboardList, group: 'Bidang' },
         ];
     }
   }
 
   // MAHASISWA
   return [
-    { href: `${base}/mahasiswa`, label: 'Dashboard', icon: Home },
-    { href: `${base}/mahasiswa/progress`, label: 'Progress Saya', icon: BarChart3 },
+    { href: `${base}/mahasiswa`, label: 'Dashboard', icon: Home, group: 'Utama' },
+    { href: `${base}/mahasiswa/progress`, label: 'Progress Saya', icon: BarChart3, group: 'Akademik' },
   ];
 }
 
@@ -120,7 +120,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const roleLabel = jabatan ? jabatanLabels[jabatan] : roleLabels[role] || role;
 
   return (
-    <div className="min-h-screen bg-bg text-fg flex">
+    <div className="relative min-h-screen bg-bg text-fg flex overflow-hidden">
+      {/* Ambient aurora glow — subtle personality, no visual weight */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-40 -left-40 w-[520px] h-[520px] rounded-full bg-[color:var(--color-accent)]/[0.05] blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/3 -right-40 w-[420px] h-[420px] rounded-full bg-[color:var(--color-brand)]/[0.07] blur-3xl"
+      />
+
       <Sidebar
         items={navItems}
         user={{
@@ -132,8 +142,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <Topbar crumbs={crumbs} onOpenSidebar={() => setSidebarOpen(true)} />
+      <div className="relative flex-1 flex flex-col min-w-0">
+        <Topbar
+          crumbs={crumbs}
+          onOpenSidebar={() => setSidebarOpen(true)}
+          user={{ name: session?.user?.name, roleLabel }}
+        />
         <main className="flex-1 p-4 md:p-8 lg:p-10 overflow-x-hidden">{children}</main>
       </div>
     </div>

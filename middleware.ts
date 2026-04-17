@@ -25,11 +25,24 @@ export default auth((req) => {
   const role = (session.user as { role?: string }).role;
   const jabatan = (session.user as { jabatan?: string | null }).jabatan ?? null;
 
-  const fallback = role === 'ADMIN'
-    ? '/dashboard/admin'
-    : role === 'MAHASISWA'
-      ? '/dashboard/mahasiswa'
-      : '/dashboard';
+  // Compute home route by role + jabatan so redirects never loop back to /dashboard
+  const homeFor = (r?: string, j?: string | null): string => {
+    if (r === 'ADMIN') return '/dashboard/admin';
+    if (r === 'MAHASISWA') return '/dashboard/mahasiswa';
+    if (r === 'PENGURUS') {
+      switch (j) {
+        case 'KETUA_UMUM': return '/dashboard/ketua';
+        case 'SEKRETARIS_UMUM': return '/dashboard/sekum/persuratan';
+        case 'BENDAHARA_UMUM': return '/dashboard/bendahara';
+        case 'KETUA_BIDANG':
+        case 'ANGGOTA_BIDANG':
+        default:
+          return '/dashboard/pengurus';
+      }
+    }
+    return '/login';
+  };
+  const fallback = homeFor(role, jabatan);
 
   // Admin keeps full access
   if (role === 'ADMIN') {
