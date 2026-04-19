@@ -1,0 +1,485 @@
+/* ────────────────────────────────────────────────────────────
+   v3 — Clean Campus Organization
+   Putih bersih, primary merah, accent kuning. Fully scoped
+   under [data-v3-root] supaya tidak bocor ke route lain.
+   ──────────────────────────────────────────────────────────── */
+
+[data-v3-root] {
+  --v3-bg: #ffffff;
+  --v3-bg-soft: #f7f8fa;
+  --v3-bg-muted: #eef0f4;
+  --v3-border: #e5e7eb;
+  --v3-border-strong: #d1d5db;
+
+  --v3-ink: #0f172a;
+  --v3-ink-soft: #334155;
+  --v3-ink-muted: #64748b;
+
+  --v3-red: #b91c1c;
+  --v3-red-deep: #7f1d1d;
+  --v3-red-soft: #fee2e2;
+  --v3-red-tint: #fef2f2;
+
+  --v3-yellow: #facc15;
+  --v3-yellow-deep: #ca8a04;
+  --v3-yellow-soft: #fef3c7;
+  --v3-yellow-tint: #fffbeb;
+
+  --v3-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --v3-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --v3-shadow-lg: 0 14px 40px -12px rgba(15, 23, 42, 0.18), 0 4px 10px rgba(15, 23, 42, 0.06);
+
+  background-color: var(--v3-bg);
+  color: var(--v3-ink);
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Override host body bg/text */
+body:has([data-v3-root]) {
+  background-color: var(--v3-bg) !important;
+  color: var(--v3-ink) !important;
+}
+
+/* ── Typography ───────────────────────────────────────────── */
+.v3-serif {
+  font-family: var(--font-lora), ui-serif, Georgia, serif;
+  letter-spacing: -0.01em;
+}
+.v3-display {
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  color: var(--v3-ink);
+}
+.v3-eyebrow {
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--v3-red);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.v3-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 2px;
+  background: var(--v3-red);
+}
+
+/* ── Color helpers ────────────────────────────────────────── */
+.v3-c-red { color: var(--v3-red); }
+.v3-c-red-deep { color: var(--v3-red-deep); }
+.v3-c-yellow { color: var(--v3-yellow); }
+.v3-c-yellow-deep { color: var(--v3-yellow-deep); }
+.v3-c-ink { color: var(--v3-ink); }
+.v3-c-ink-soft { color: var(--v3-ink-soft); }
+.v3-c-ink-muted { color: var(--v3-ink-muted); }
+.v3-c-white { color: #ffffff; }
+
+.v3-bg-soft { background-color: var(--v3-bg-soft); }
+.v3-bg-muted { background-color: var(--v3-bg-muted); }
+.v3-bg-red { background-color: var(--v3-red); }
+.v3-bg-red-tint { background-color: var(--v3-red-tint); }
+.v3-bg-yellow-tint { background-color: var(--v3-yellow-tint); }
+
+.v3-border { border-color: var(--v3-border); }
+.v3-border-strong { border-color: var(--v3-border-strong); }
+
+/* ── Highlight (yellow marker) ────────────────────────────── */
+.v3-highlight {
+  background: linear-gradient(180deg, transparent 60%, var(--v3-yellow) 60%);
+  padding: 0 0.1em;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.v3-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.4rem;
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+.v3-btn-primary {
+  background: var(--v3-red);
+  color: #ffffff;
+  box-shadow: var(--v3-shadow-md);
+}
+.v3-btn-primary:hover {
+  background: var(--v3-red-deep);
+  transform: translateY(-1px);
+  box-shadow: var(--v3-shadow-lg);
+}
+.v3-btn-yellow {
+  background: var(--v3-yellow);
+  color: var(--v3-ink);
+  box-shadow: var(--v3-shadow-md);
+}
+.v3-btn-yellow:hover {
+  background: var(--v3-yellow-deep);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+.v3-btn-outline {
+  background: #ffffff;
+  color: var(--v3-ink);
+  border-color: var(--v3-border-strong);
+}
+.v3-btn-outline:hover {
+  border-color: var(--v3-red);
+  color: var(--v3-red);
+}
+.v3-btn-ghost {
+  background: transparent;
+  color: var(--v3-ink-soft);
+}
+.v3-btn-ghost:hover {
+  color: var(--v3-red);
+  background: var(--v3-red-tint);
+}
+
+/* ── Cards ────────────────────────────────────────────────── */
+.v3-card {
+  background: #ffffff;
+  border: 1px solid var(--v3-border);
+  border-radius: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.v3-card:hover {
+  border-color: var(--v3-border-strong);
+  box-shadow: var(--v3-shadow-md);
+}
+.v3-card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: var(--v3-red);
+  box-shadow: var(--v3-shadow-lg);
+}
+
+/* ── Badges ───────────────────────────────────────────────── */
+.v3-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: var(--v3-bg-muted);
+  color: var(--v3-ink-soft);
+}
+.v3-badge-red {
+  background: var(--v3-red-tint);
+  color: var(--v3-red);
+}
+.v3-badge-yellow {
+  background: var(--v3-yellow-tint);
+  color: var(--v3-yellow-deep);
+}
+
+/* ── Hero pattern (subtle dots) ───────────────────────────── */
+.v3-dots {
+  background-image: radial-gradient(var(--v3-border-strong) 1px, transparent 1px);
+  background-size: 18px 18px;
+  background-position: -1px -1px;
+}
+
+/* ── Decorative red/yellow shapes ─────────────────────────── */
+.v3-blob-red {
+  position: absolute;
+  border-radius: 999px;
+  background: var(--v3-red-tint);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+.v3-blob-yellow {
+  position: absolute;
+  border-radius: 999px;
+  background: var(--v3-yellow-tint);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Section divider with center ornament ─────────────────── */
+.v3-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.v3-divider::before,
+.v3-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--v3-border);
+}
+.v3-divider-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--v3-red);
+  border-radius: 999px;
+}
+
+/* ── Stat card with red accent bar ────────────────────────── */
+.v3-stat {
+  position: relative;
+  padding: 1.5rem 1.5rem 1.5rem 1.75rem;
+  background: #ffffff;
+  border: 1px solid var(--v3-border);
+  border-radius: 0.85rem;
+  overflow: hidden;
+}
+.v3-stat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.25rem;
+  bottom: 1.25rem;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--v3-red);
+}
+.v3-stat.v3-stat-yellow::before {
+  background: var(--v3-yellow);
+}
+
+/* ── Bidang card grid item ────────────────────────────────── */
+.v3-bidang-card {
+  background: #ffffff;
+  border: 1px solid var(--v3-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.v3-bidang-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -30% -50% auto;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, var(--v3-yellow-tint) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.v3-bidang-card:hover {
+  border-color: var(--v3-red);
+  transform: translateY(-3px);
+  box-shadow: var(--v3-shadow-md);
+}
+.v3-bidang-card:hover::after { opacity: 1; }
+.v3-bidang-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.6rem;
+  background: var(--v3-red-tint);
+  color: var(--v3-red);
+  display: grid;
+  place-items: center;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.v3-bidang-card:hover .v3-bidang-card-icon {
+  background: var(--v3-red);
+  color: #ffffff;
+}
+
+/* ── Leader portrait card ─────────────────────────────────── */
+.v3-leader {
+  background: #ffffff;
+  border: 1px solid var(--v3-border);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.v3-leader:hover {
+  border-color: var(--v3-red);
+  box-shadow: var(--v3-shadow-md);
+  transform: translateY(-3px);
+}
+.v3-leader-photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--v3-bg-muted);
+  overflow: hidden;
+}
+.v3-leader-photo img {
+  transition: transform 0.5s ease;
+}
+.v3-leader:hover .v3-leader-photo img {
+  transform: scale(1.04);
+}
+
+/* Sticky topbar */
+.v3-topbar {
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid var(--v3-border);
+}
+
+/* Logo mark (round: red ring + yellow inner) */
+.v3-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--v3-red);
+  display: grid;
+  place-items: center;
+  position: relative;
+  flex-shrink: 0;
+}
+.v3-mark::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--v3-yellow);
+}
+.v3-mark::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Skip-of-flag corner ribbon (period badge) */
+.v3-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  background: var(--v3-yellow-tint);
+  border: 1px solid var(--v3-yellow);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--v3-yellow-deep);
+  letter-spacing: 0.02em;
+}
+.v3-ribbon-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--v3-red);
+  animation: v3-pulse 2s ease-in-out infinite;
+}
+
+@keyframes v3-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* Quote block */
+.v3-quote {
+  background: var(--v3-bg-soft);
+  border-left: 4px solid var(--v3-red);
+  padding: 1.5rem 1.75rem;
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+
+/* Underline on link hover */
+.v3-link {
+  position: relative;
+  color: var(--v3-red);
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+.v3-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1.5px;
+  background: var(--v3-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.v3-link:hover::after { transform: scaleX(1); }
+
+/* Container helper */
+.v3-container {
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  max-width: 80rem;
+}
+@media (min-width: 768px) {
+  .v3-container { padding-inline: 2rem; }
+}
+
+/* Section spacing */
+.v3-section {
+  padding-block: 4rem;
+}
+@media (min-width: 768px) {
+  .v3-section { padding-block: 6rem; }
+}
+
+/* Period table */
+.v3-period {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--v3-border);
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+.v3-period:hover {
+  border-color: var(--v3-red);
+  background: var(--v3-red-tint);
+}
+
+/* Mobile nav drawer */
+.v3-drawer {
+  background: #ffffff;
+  border-top: 1px solid var(--v3-border);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .v3-ribbon-dot { animation: none; }
+}
+
+/* ── Decorative absolute pieces (avoid inline styles) ─── */
+.v3-yellow-square {
+  background: var(--v3-yellow);
+}
+
+.v3-cta-blob-yellow {
+  background: rgba(250, 204, 21, 0.18);
+  filter: blur(20px);
+}
+.v3-cta-blob-white {
+  background: rgba(255, 255, 255, 0.08);
+  filter: blur(40px);
+}
+

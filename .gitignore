@@ -11,3 +11,8 @@ coverage/
 # user uploads (keep folder via .gitkeep)
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# autoskills (skills installed locally, not committed)
+.claude/
+.agents/
+skills-lock.json
