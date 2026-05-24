@@ -3,11 +3,12 @@
 import Image from 'next/image';
 import { useEffect, useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface HeroSlide {
-  src: string;
+  /** URL gambar yang sudah di-upload. Boleh null/kosong → render placeholder. */
+  src?: string | null;
   alt: string;
   caption?: string;
 }
@@ -87,15 +88,31 @@ export function HeroSlider({ slides, interval = 5500, className }: HeroSliderPro
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
         >
-          <Image
-            src={current.src}
-            alt={current.alt}
-            fill
-            sizes="(max-width: 1024px) 100vw, 60vw"
-            priority={index === 0}
-            className="object-cover"
-            referrerPolicy="no-referrer"
-          />
+          {current.src ? (
+            <Image
+              src={current.src}
+              alt={current.alt}
+              fill
+              sizes="(max-width: 1024px) 100vw, 60vw"
+              priority={index === 0}
+              className="object-cover"
+            />
+          ) : (
+            <div
+              role="img"
+              aria-label={current.alt}
+              className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-fg-muted"
+              style={{
+                background:
+                  'radial-gradient(120% 80% at 20% 0%, rgba(255,211,74,0.18) 0%, transparent 55%), linear-gradient(135deg, rgba(58,26,31,0.85), rgba(15,10,12,0.95))',
+              }}
+            >
+              <ImageOff size={28} aria-hidden="true" className="opacity-60" />
+              <p className="text-[11px] font-mono uppercase tracking-[0.25em] opacity-75">
+                Belum ada foto
+              </p>
+            </div>
+          )}
           {/* Gradient overlay bawah untuk caption readability */}
           <div
             aria-hidden="true"

@@ -178,7 +178,8 @@ export default function LoginPage() {
               Masuk ke Dashboard
             </h2>
             <p className="text-sm font-mono text-fg-secondary">
-              Gunakan NIM dan password yang diberikan pengurus.
+              Mahasiswa: gunakan <span className="text-fg font-semibold">NIM &amp; password SIMAK</span> Anda.
+              Pengurus/admin internal: gunakan kredensial yang diberikan.
             </p>
           </div>
 
@@ -186,7 +187,7 @@ export default function LoginPage() {
             <FormField
               id="nim"
               label="NIM"
-              helperText="Contoh: 2024001"
+              helperText="Mahasiswa: NIM SIMAK (mis. 105841100120). Akun internal: NIM yang diberikan."
               error={nimError}
             >
               <Input

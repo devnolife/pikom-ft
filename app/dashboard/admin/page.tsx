@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   Users, ClipboardList, Shield, TrendingUp, CheckCircle2,
-  GraduationCap, ArrowRight,
+  GraduationCap, ArrowRight, Image as ImageIcon,
 } from 'lucide-react';
 import { PageHeader } from '@/components/dashboard/page-header';
 import { StatCard } from '@/components/dashboard/stat-card';
@@ -99,7 +99,7 @@ export default function AdminPage() {
       </div>
 
       {/* Quick links */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
         <QuickLink
           href="/dashboard/admin/users"
           icon={Users}
@@ -111,6 +111,12 @@ export default function AdminPage() {
           icon={ClipboardList}
           title="Program Kerja"
           desc="Tinjau semua proker dari seluruh bidang dan statusnya."
+        />
+        <QuickLink
+          href="/dashboard/admin/landing"
+          icon={ImageIcon}
+          title="Gambar Landing"
+          desc="Upload foto hero, pimpinan inti, dan cover bidang untuk halaman publik."
         />
       </div>
 

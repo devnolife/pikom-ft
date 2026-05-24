@@ -42,10 +42,13 @@ model User {
   id        String   @id @default(cuid())
   nim       String   @unique
   name      String
+  email     String?
+  prodi     String?
   password  String
   role      Role     @default(MAHASISWA)
   jabatan   Jabatan?
   bidang    String?
+  source    String   @default("LOCAL") // LOCAL | SIMAK
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -54,6 +57,21 @@ model User {
   suratMade   Surat[]     @relation("SuratCreator")
   aturanMade  Aturan[]    @relation("AturanCreator")
   transaksiMade Transaksi[] @relation("TransaksiCreator")
+  landingAssets LandingAsset[] @relation("LandingAssetUploader")
+}
+
+/// Asset gambar untuk landing pages (hero, pimpinan inti, ketua bidang, dst).
+/// `key` = slot identifier yang stabil, dipakai di komponen.
+/// Conoth key: `hero.1`, `hero.2`, `pimpinan.ketua-umum`, `bidang.organisasi.ketua`.
+model LandingAsset {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  url        String
+  alt        String?
+  uploadedBy String?
+  uploader   User?    @relation("LandingAssetUploader", fields: [uploadedBy], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Progress {

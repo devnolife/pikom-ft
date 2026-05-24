@@ -1,16 +1,29 @@
 node_modules/
 .next/
+out/
+build/
 coverage/
 .DS_Store
 *.log
 .env*
 !.env.example
 
+# Local databases & build artifacts
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.tsbuildinfo
+build_output.txt
+
 /generated/prisma
 
 # user uploads (keep folder via .gitkeep)
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# Firebase tooling cache (if used)
+.firebase/
 
 # autoskills (skills installed locally, not committed)
 .claude/

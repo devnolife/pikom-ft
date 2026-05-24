@@ -17,11 +17,14 @@ interface BidangCardProps {
   index: number;
   /** Variant "featured" = lebih besar (col-span-2 row-span-2). */
   variant?: 'default' | 'featured' | 'wide';
+  /** URL cover yang sudah di-upload via admin. Optional. */
+  coverUrl?: string | null;
 }
 
 /**
  * BidangCard — card untuk grid 10 bidang di landing. Variant-aware.
- * Background image dari picsum dengan seed deterministic per bidang.
+ * Cover image opsional dari LandingAsset; kalau tidak ada, fallback ke
+ * gradient solid bertekstur.
  */
 export function BidangCard({
   name,
@@ -30,9 +33,9 @@ export function BidangCard({
   slug,
   index,
   variant = 'default',
+  coverUrl,
 }: BidangCardProps) {
   const router = useRouter();
-  const seed = name.toLowerCase().replace(/\s+/g, '');
   const spanClass =
     variant === 'featured'
       ? 'md:col-span-2 md:row-span-2'
@@ -70,17 +73,27 @@ export function BidangCard({
         style={{ viewTransitionName: `bidang-card-${slug}` }}
         className="relative glass rounded-2xl overflow-hidden gradient-border hover:shadow-[0_12px_40px_-12px_rgba(255,215,0,0.25)] transition-all duration-500 flex flex-col justify-between h-full min-h-[300px]"
       >
-        {/* Background image + overlay */}
+        {/* Background — image bila ada, fallback gradient. */}
         <div className="absolute inset-0 z-0">
-          <Image
-            src={`https://picsum.photos/seed/${seed}/800/800`}
-            alt=""
-            aria-hidden="true"
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover opacity-40 group-hover:opacity-55 group-hover:scale-105 transition-all duration-500"
-            referrerPolicy="no-referrer"
-          />
+          {coverUrl ? (
+            <Image
+              src={coverUrl}
+              alt=""
+              aria-hidden="true"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover opacity-40 group-hover:opacity-55 group-hover:scale-105 transition-all duration-500"
+            />
+          ) : (
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 opacity-50 group-hover:opacity-70 transition-opacity"
+              style={{
+                background:
+                  'radial-gradient(120% 80% at 20% 0%, rgba(255,211,74,0.18) 0%, transparent 55%), linear-gradient(135deg, rgba(58,26,31,0.85), rgba(15,10,12,0.95))',
+              }}
+            />
+          )}
           <div
             className="absolute inset-0"
             style={{
