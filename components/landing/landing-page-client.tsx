@@ -4,8 +4,6 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
-  Network, Users, FlaskConical, Flower2, Landmark,
-  BookOpen, TrendingUp, HeartHandshake, Palette, Radio,
   ArrowRight, ArrowUp, ChevronDown, Sparkles, Quote,
 } from 'lucide-react';
 
@@ -16,37 +14,14 @@ import { LeaderCard } from '@/components/landing/leader-card';
 import { DecorativeBlobs } from '@/components/landing/decorative-blobs';
 import { HeroSlider, type HeroSlide } from '@/components/landing/hero-slider';
 import { Section } from '@/components/ui/section';
+import { resolveBidangIcon } from '@/lib/landing-icons';
 import type { LandingAssetData } from '@/lib/landing-assets';
-
-// ── Data statis (text saja) ─────────────────────────────────
-
-const pimpinanInti = [
-  { key: 'pimpinan.ketua-umum',     title: 'Ketua Umum',       role: 'Pimpinan Tertinggi',         nama: 'Ahmad Fauzi',   featured: true },
-  { key: 'pimpinan.sekretaris-umum',title: 'Sekretaris Umum',  role: 'Administrasi & Operasional', nama: 'Rina Lestari' },
-  { key: 'pimpinan.bendahara-umum', title: 'Bendahara Umum',   role: 'Manajemen Keuangan',         nama: 'Dian Prasetyo' },
-  { key: 'pimpinan.bendahara-1',    title: 'Bendahara 1',      role: 'Keuangan Internal',          nama: 'Fitri Amalia' },
-  { key: 'pimpinan.bendahara-2',    title: 'Bendahara 2',      role: 'Keuangan Eksternal',         nama: 'Rizky Pratama' },
-];
-
-const pengurusSebelumnya = [
-  { periode: '2024–2025', ketua: 'Ahmad Fauzi' },
-  { periode: '2023–2024', ketua: 'Muhammad Rizki' },
-  { periode: '2022–2023', ketua: 'Andi Pratama' },
-  { periode: '2021–2022', ketua: 'Ilham Saputra' },
-];
-
-const bidangData = [
-  { name: 'Organisasi', slug: 'organisasi', icon: Network, desc: 'Diarahkan pada tercapainya struktur, fungsi dan stabilitas organisasi serta mekanisme kepemimpinan yang mantap. Program konsolidasi gerakan IMM diarahkan pada terciptanya kekuatan gerak IMM baik kedalam maupun keluar.' },
-  { name: 'Kader', slug: 'kader', icon: Users, desc: 'Diarahkan pada penguatan tri kompetensi dasar (aqidah, intelektual dan humanitas) yang secara dinamis mampu menempatkan diri sebagai pelaku perubahan sosial masyarakat dan ikatan.' },
-  { name: 'Riset & Pengembangan', slug: 'riset-pengembangan', icon: FlaskConical, desc: 'Diarahkan pada penguatan basis metodologi riset dan pengembangan sinergisitas keilmuan kader di semua disiplin ilmu.' },
-  { name: 'Immawati', slug: 'immawati', icon: Flower2, desc: 'Diarahkan pada upaya penguatan jati diri dan peran aktif potensi sumber daya putri dalam transformasi sosial menuju masyarakat utama berbasis pada paradigma Dakwah dan berkeadilan gender.' },
-  { name: 'Hikmah', slug: 'hikmah', icon: Landmark, desc: 'Diarahkan pada penguatan peran sosial-politik IMM di tengah kehidupan berbangsa dan bernegara. Pemetaan basis data sosial politik, penguatan peran intelektual kader, dan laboratorium politik.' },
-  { name: 'Tabligh', slug: 'tabligh', icon: BookOpen, desc: 'Diarahkan pada gerakan dakwah Islam bernuansa pencerahan dan memakmurkan masjid kampus sebagai basis gerakan dakwah IMM.' },
-  { name: 'Ekonomi & Kewirausahaan', slug: 'ekonomi-kewirausahaan', icon: TrendingUp, desc: 'Diarahkan pada pengembangan kapasitas kewirausahaan kader dan organisasi guna mencapai cita-cita kemandirian organisasi.' },
-  { name: 'SPM', slug: 'spm', icon: HeartHandshake, desc: 'Diarahkan pada kemampuan institusi IMM melakukan kerja-kerja pemberdayaan masyarakat di akar rumput sebagai terjemahan humanitas kader, terintegrasi dengan dakwah Muhammadiyah.' },
-  { name: 'SBO', slug: 'sbo', icon: Palette, desc: 'Diarahkan pada pembentukan paradigma multikultral sesuai nilai Ke-Muhammadiyahan dan aktualisasi kreatifitas seni, budaya dan olahraga sebagai bagian dari gerakan dakwah Islam.' },
-  { name: 'Media & Komunikasi', slug: 'media-komunikasi', icon: Radio, desc: 'Diarahkan pada terbangunnya sistem komunikasi internal dan eksternal IMM, pembangunan image IMM, media komunitas yang mumpuni, dan meningkatkan bargaining position.' },
-];
+import type {
+  LandingBidangData,
+  LandingPeriodeData,
+  LandingPimpinanData,
+  LandingContentMap,
+} from '@/lib/landing-content';
 
 const navLinks = [
   { href: '#about', label: 'Tentang' },
@@ -54,40 +29,36 @@ const navLinks = [
   { href: '#bidang', label: 'Bidang' },
 ];
 
-const statsData = [
-  { label: 'Bidang', value: 10 },
-  { label: 'Pimpinan Inti', value: 5 },
-  { label: 'Kader Aktif', value: 120, suffix: '+' },
-  { label: 'Periode Aktif', value: 4, suffix: '' },
-];
-
 const heroSlideDefs: Array<{ alt: string; caption?: string }> = [
-  {
-    alt: 'Foto bersama pengurus PIKOM FT di acara pelantikan',
-    caption: 'Pelantikan Pengurus PIKOM Fakultas Teknik — Periode 2025–2026',
-  },
-  {
-    alt: 'Diskusi kader dalam forum mingguan',
-    caption: 'Forum Diskusi Kader — Membangun intelektual bersama',
-  },
-  {
-    alt: 'Kegiatan pengabdian masyarakat oleh kader PIKOM FT',
-    caption: 'Pengabdian Masyarakat — Humanitas dalam aksi nyata',
-  },
-  {
-    alt: 'Rapat kerja tahunan seluruh bidang',
-    caption: 'Rapat Kerja Tahunan — Konsolidasi 10 bidang organisasi',
-  },
+  { alt: 'Foto bersama pengurus PIKOM FT di acara pelantikan',  caption: 'Pelantikan Pengurus PIKOM Fakultas Teknik — Periode 2025–2026' },
+  { alt: 'Diskusi kader dalam forum mingguan',                  caption: 'Forum Diskusi Kader — Membangun intelektual bersama' },
+  { alt: 'Kegiatan pengabdian masyarakat oleh kader PIKOM FT',  caption: 'Pengabdian Masyarakat — Humanitas dalam aksi nyata' },
+  { alt: 'Rapat kerja tahunan seluruh bidang',                  caption: 'Rapat Kerja Tahunan — Konsolidasi 10 bidang organisasi' },
 ];
 
-// ── Page ──────────────────────────────────────────────────────
+const t = (content: LandingContentMap, key: string, fallback = ''): string =>
+  content[key] ?? fallback;
+
+const numOr = (content: LandingContentMap, key: string, fallback: number): number => {
+  const v = Number.parseInt(content[key] ?? '', 10);
+  return Number.isFinite(v) ? v : fallback;
+};
 
 interface LandingPageClientProps {
-  /** Map key → asset, di-fetch di server component pembungkus. */
   assets: Record<string, LandingAssetData>;
+  pimpinan: LandingPimpinanData[];
+  bidang: LandingBidangData[];
+  periode: LandingPeriodeData[];
+  content: LandingContentMap;
 }
 
-export function LandingPageClient({ assets }: LandingPageClientProps) {
+export function LandingPageClient({
+  assets,
+  pimpinan,
+  bidang,
+  periode,
+  content,
+}: LandingPageClientProps) {
   const [activeSection, setActiveSection] = useState('about');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -95,6 +66,13 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
     const a = assets[`hero.${i + 1}`];
     return { src: a?.url ?? null, alt: a?.alt || s.alt, caption: s.caption };
   });
+
+  const statsData = [
+    { label: t(content, 'stats.bidang.label', 'Bidang'),       value: numOr(content, 'stats.bidang.value', bidang.length || 10) },
+    { label: t(content, 'stats.pimpinan.label', 'Pimpinan Inti'), value: numOr(content, 'stats.pimpinan.value', pimpinan.length || 5) },
+    { label: t(content, 'stats.kader.label', 'Kader Aktif'),   value: numOr(content, 'stats.kader.value', 120), suffix: t(content, 'stats.kader.suffix', '+') },
+    { label: t(content, 'stats.periode.label', 'Periode Aktif'), value: numOr(content, 'stats.periode.value', periode.length || 4), suffix: '' },
+  ];
 
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 600);
@@ -138,7 +116,7 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
             <div className="flex items-center gap-3 mb-6">
               <span className="inline-flex items-center gap-2 glass px-3 py-1.5 rounded-full text-[11px] font-mono uppercase tracking-[0.2em] text-accent">
                 <Sparkles size={12} aria-hidden="true" />
-                Periode 2025–2026
+                {t(content, 'hero.eyebrow', 'Periode 2025–2026')}
               </span>
             </div>
 
@@ -149,7 +127,7 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
                 transition={{ delay: 0.2, duration: 0.55 }}
                 className="inline-block text-maroon"
               >
-                Pikom
+                {t(content, 'hero.title.1', 'Pikom')}
               </motion.span>
               <br />
               <motion.span
@@ -158,7 +136,7 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
                 transition={{ delay: 0.35, duration: 0.55 }}
                 className="inline-block text-gold"
               >
-                Teknik
+                {t(content, 'hero.title.2', 'Teknik')}
               </motion.span>
             </h1>
 
@@ -168,8 +146,7 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
               transition={{ delay: 0.55, duration: 0.6 }}
               className="text-base md:text-lg font-mono leading-relaxed text-fg-secondary max-w-xl mb-10"
             >
-              Pimpinan Komisariat IMM di lingkup Fakultas Teknik. Membangun
-              kader berintelektual, berhumanitas, dan beraqidah kuat.
+              {t(content, 'hero.tagline', 'Pimpinan Komisariat IMM di lingkup Fakultas Teknik.')}
             </motion.p>
 
             <motion.div
@@ -182,14 +159,14 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
                 href="#struktur"
                 className="group inline-flex items-center gap-2 bg-accent text-[color:var(--color-selection-text)] px-7 py-3.5 rounded-full uppercase text-[11px] font-bold tracking-[0.2em] hover:scale-[1.02] transition-transform shadow-lg shadow-black/20"
               >
-                Jelajahi Struktur
+                {t(content, 'hero.cta.primary', 'Jelajahi Struktur')}
                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </a>
               <Link
                 href="/login"
                 className="glass inline-flex items-center gap-2 px-7 py-3.5 rounded-full uppercase text-[11px] font-bold tracking-[0.2em] hover:bg-white/10 transition-colors"
               >
-                Masuk Dashboard
+                {t(content, 'hero.cta.secondary', 'Masuk Dashboard')}
               </Link>
             </motion.div>
           </motion.div>
@@ -206,21 +183,21 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
             <div className="mt-4 grid grid-cols-3 gap-3">
               <div className="glass rounded-xl px-4 py-3">
                 <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-accent mb-1">
-                  Sejak
+                  {t(content, 'hero.stat.sejak.label', 'Sejak')}
                 </p>
-                <p className="text-xl font-black">1964</p>
+                <p className="text-xl font-black">{t(content, 'hero.stat.sejak.value', '1964')}</p>
               </div>
               <div className="glass rounded-xl px-4 py-3">
                 <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-accent mb-1">
-                  Kader
+                  {t(content, 'hero.stat.kader.label', 'Kader')}
                 </p>
-                <p className="text-xl font-black">120+</p>
+                <p className="text-xl font-black">{t(content, 'hero.stat.kader.value', '120+')}</p>
               </div>
               <div className="glass rounded-xl px-4 py-3">
                 <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-accent mb-1">
-                  Bidang
+                  {t(content, 'hero.stat.bidang.label', 'Bidang')}
                 </p>
-                <p className="text-xl font-black">10</p>
+                <p className="text-xl font-black">{t(content, 'hero.stat.bidang.value', '10')}</p>
               </div>
             </div>
           </motion.div>
@@ -255,9 +232,9 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
           TENTANG PIKOM
           ═══════════════════════════════════════════════════════ */}
       <Section
-        eyebrow="Tentang PIKOM"
-        title={<>Anggun dalam <span className="text-gold">Moral</span>,<br />Unggul dalam Intelektual</>}
-        description="Ikatan Mahasiswa Muhammadiyah (IMM) Pimpinan Komisariat Fakultas Teknik adalah organisasi mahasiswa otonom di bawah Muhammadiyah yang bergerak di bidang keagamaan, kemahasiswaan, dan kemasyarakatan."
+        eyebrow={t(content, 'about.eyebrow', 'Tentang PIKOM')}
+        title={t(content, 'about.title', 'Anggun dalam Moral, Unggul dalam Intelektual')}
+        description={t(content, 'about.description', 'Ikatan Mahasiswa Muhammadiyah (IMM) Pimpinan Komisariat Fakultas Teknik adalah organisasi mahasiswa otonom di bawah Muhammadiyah yang bergerak di bidang keagamaan, kemahasiswaan, dan kemasyarakatan.')}
         container="max-w-6xl"
       >
         <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
@@ -272,12 +249,10 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
               <Quote size={20} className="text-accent" aria-hidden="true" />
             </div>
             <p className="text-lg md:text-xl font-mono leading-relaxed text-fg">
-              &ldquo;IMM untuk kemanusiaan, IMM untuk ilmu, IMM untuk agama.
-              Kami hadir sebagai wadah pengkaderan mahasiswa muslim yang
-              berkarakter.&rdquo;
+              &ldquo;{t(content, 'about.quote', 'IMM untuk kemanusiaan, IMM untuk ilmu, IMM untuk agama.')}&rdquo;
             </p>
             <div className="pt-4 border-t border-border">
-              <p className="text-label">Falsafah Gerakan IMM</p>
+              <p className="text-label">{t(content, 'about.quote.source', 'Falsafah Gerakan IMM')}</p>
             </div>
           </motion.div>
 
@@ -288,24 +263,24 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
-            {[
-              { label: 'Visi', body: 'Terbentuknya akademisi Islam berkarakter, menjalankan amal dakwah di tengah masyarakat.' },
-              { label: 'Misi', body: 'Membina keimanan, memperjuangkan nilai keilmuan, menggerakkan kemanusiaan.' },
-              { label: 'Nilai', body: 'Religiusitas, intelektualitas, humanitas — tiga pilar kader IMM.' },
-              { label: 'Arah', body: 'Menjawab tantangan zaman dengan basis iman, ilmu, dan aksi nyata.' },
-            ].map((item, i) => (
+            {[1, 2, 3, 4].map((n, i) => {
+              const label = t(content, `about.value.${n}.label`, '');
+              const body = t(content, `about.value.${n}.body`, '');
+              if (!label && !body) return null;
+              return (
               <div
-                key={item.label}
+                key={n}
                 className="glass rounded-2xl p-6 flex flex-col gap-3 hover:-translate-y-1 transition-transform"
               >
                 <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-accent">
-                  0{i + 1} / {item.label}
+                  0{i + 1} / {label}
                 </span>
                 <p className="text-sm font-mono leading-relaxed text-fg-secondary">
-                  {item.body}
+                  {body}
                 </p>
               </div>
-            ))}
+              );
+            })}
           </motion.div>
         </div>
       </Section>
@@ -315,35 +290,48 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
           ═══════════════════════════════════════════════════════ */}
       <Section
         id="struktur"
-        eyebrow="Kepemimpinan"
+        eyebrow={t(content, 'section.struktur.eyebrow', 'Kepemimpinan')}
         title={<>Pimpinan <span className="text-gold">Inti</span></>}
-        description="Struktur kepengurusan tingkat komisariat yang menjadi motor penggerak utama. Ketua Umum memimpin, didampingi Sekretaris dan tiga Bendahara."
+        description={t(content, 'section.struktur.description', 'Struktur kepengurusan tingkat komisariat.')}
         container="max-w-6xl"
         className="border-t border-border"
       >
         <div className="grid lg:grid-cols-12 gap-5 md:gap-6">
-          {/* Featured: Ketua Umum */}
-          <div className="lg:col-span-6 lg:row-span-2">
-            <LeaderCard
-              title={pimpinanInti[0].title}
-              role={pimpinanInti[0].role}
-              nama={pimpinanInti[0].nama}
-              img={assets[pimpinanInti[0].key]?.url ?? null}
-              index={0}
-              variant="featured"
-            />
-          </div>
-          {pimpinanInti.slice(1).map((p, i) => (
-            <div key={p.title} className="lg:col-span-3">
-              <LeaderCard
-                title={p.title}
-                role={p.role}
-                nama={p.nama}
-                img={assets[p.key]?.url ?? null}
-                index={i + 1}
-              />
-            </div>
-          ))}
+          {pimpinan.length === 0 ? (
+            <p className="lg:col-span-12 text-center text-sm font-mono text-fg-muted py-10">
+              Pimpinan inti belum diatur. Admin dapat menambahkan via dashboard.
+            </p>
+          ) : (
+            (() => {
+              const featured = pimpinan.find((p) => p.featured) ?? pimpinan[0];
+              const others = pimpinan.filter((p) => p.slug !== featured.slug);
+              return (
+                <>
+                  <div className="lg:col-span-6 lg:row-span-2">
+                    <LeaderCard
+                      title={featured.title}
+                      role={featured.role ?? undefined}
+                      nama={featured.nama}
+                      img={assets[`pimpinan.${featured.slug}`]?.url ?? null}
+                      index={0}
+                      variant="featured"
+                    />
+                  </div>
+                  {others.map((p, i) => (
+                    <div key={p.slug} className="lg:col-span-3">
+                      <LeaderCard
+                        title={p.title}
+                        role={p.role ?? undefined}
+                        nama={p.nama}
+                        img={assets[`pimpinan.${p.slug}`]?.url ?? null}
+                        index={i + 1}
+                      />
+                    </div>
+                  ))}
+                </>
+              );
+            })()
+          )}
         </div>
       </Section>
 
@@ -352,25 +340,25 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
           ═══════════════════════════════════════════════════════ */}
       <Section
         id="bidang"
-        eyebrow="10 Bidang"
+        eyebrow={t(content, 'section.bidang.eyebrow', `${bidang.length} Bidang`)}
         title={<>Struktur <span className="text-gold">Bidang</span></>}
-        description="Setiap bidang dipimpin oleh Ketua Bidang, dibantu oleh Sekretaris Bidang, dan menaungi departemen-departemen spesifik."
+        description={t(content, 'section.bidang.description', 'Setiap bidang dipimpin oleh Ketua Bidang dan Sekretaris Bidang.')}
         className="bg-bg-alt border-y border-border"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 auto-rows-[minmax(300px,auto)] md:auto-rows-[280px]">
-          {bidangData.map((bidang, index) => {
+          {bidang.map((b, index) => {
             const variant =
               index === 0 ? 'featured' : index === 6 || index === 9 ? 'wide' : 'default';
             return (
               <BidangCard
-                key={bidang.slug}
-                name={bidang.name}
-                desc={bidang.desc}
-                icon={bidang.icon}
-                slug={bidang.slug}
+                key={b.slug}
+                name={b.name}
+                desc={b.desc}
+                icon={resolveBidangIcon(b.icon)}
+                slug={b.slug}
                 index={index}
                 variant={variant}
-                coverUrl={assets[`bidang.${bidang.slug}.cover`]?.url ?? null}
+                coverUrl={assets[`bidang.${b.slug}.cover`]?.url ?? null}
               />
             );
           })}
@@ -381,15 +369,15 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
           PENGURUS SEBELUMNYA
           ═══════════════════════════════════════════════════════ */}
       <Section
-        eyebrow="Jejak Kepemimpinan"
+        eyebrow={t(content, 'section.periode.eyebrow', 'Jejak Kepemimpinan')}
         title={<>Pengurus <span className="text-gold">Sebelumnya</span></>}
-        description="Estafet kepemimpinan PIKOM Fakultas Teknik dari periode ke periode."
+        description={t(content, 'section.periode.description', 'Estafet kepemimpinan dari periode ke periode.')}
         container="max-w-6xl"
       >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-          {pengurusSebelumnya.map((item, i) => (
+          {periode.map((item, i) => (
             <motion.div
-              key={item.periode}
+              key={item.periode + item.ketua}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
@@ -421,35 +409,34 @@ export function LandingPageClient({ assets }: LandingPageClientProps) {
           className="relative mx-auto max-w-4xl text-center z-10"
         >
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase mb-6">
-            Siap <span className="text-gold">Bergerak?</span>
+            {t(content, 'cta.title.before', 'Siap')} <span className="text-gold">{t(content, 'cta.title.gold', 'Bergerak?')}</span>
           </h2>
           <p className="text-base md:text-lg font-mono leading-relaxed text-fg-secondary max-w-xl mx-auto mb-10">
-            Jadilah bagian dari perubahan. Mari bersama-sama mewujudkan
-            cita-cita Ikatan Mahasiswa Muhammadiyah di Fakultas Teknik.
+            {t(content, 'cta.description', 'Jadilah bagian dari perubahan.')}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/login"
               className="inline-flex items-center gap-2 bg-accent text-[color:var(--color-selection-text)] px-8 py-4 rounded-full uppercase text-[11px] font-bold tracking-[0.2em] hover:scale-[1.02] transition-transform shadow-lg shadow-black/20"
             >
-              Masuk Dashboard
+              {t(content, 'cta.button.primary', 'Masuk Dashboard')}
               <ArrowRight size={16} />
             </Link>
             <a
               href="#about"
               className="glass inline-flex items-center gap-2 px-8 py-4 rounded-full uppercase text-[11px] font-bold tracking-[0.2em] hover:bg-white/10 transition-colors"
             >
-              Pelajari Lebih
+              {t(content, 'cta.button.secondary', 'Pelajari Lebih')}
             </a>
           </div>
         </motion.div>
 
         <div className="relative z-10 mt-20 pt-8 mx-auto max-w-6xl flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] font-mono uppercase tracking-widest text-fg-muted border-t border-border">
-          <p>&copy; 2026 PIKOM TEKNIK IMM</p>
+          <p>{t(content, 'footer.copyright', '© 2026 PIKOM TEKNIK IMM')}</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-accent transition-colors">Instagram</a>
-            <a href="#" className="hover:text-accent transition-colors">Twitter</a>
-            <a href="#" className="hover:text-accent transition-colors">Email</a>
+            <a href="#" className="hover:text-accent transition-colors">{t(content, 'footer.link.1', 'Instagram')}</a>
+            <a href="#" className="hover:text-accent transition-colors">{t(content, 'footer.link.2', 'Twitter')}</a>
+            <a href="#" className="hover:text-accent transition-colors">{t(content, 'footer.link.3', 'Email')}</a>
           </div>
         </div>
       </footer>

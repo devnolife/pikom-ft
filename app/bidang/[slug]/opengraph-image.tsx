@@ -1,13 +1,12 @@
 import { ImageResponse } from 'next/og';
-import { bidangDetail } from '@/app/data/bidang';
+import { getBidangBySlug } from '@/lib/landing-content';
 
-export const runtime = 'edge';
 export const alt = 'PIKOM Teknik IMM — Bidang';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 export default async function Image({ params }: { params: { slug: string } }) {
-  const bidang = bidangDetail.find((b) => b.slug === params.slug);
+  const bidang = await getBidangBySlug(params.slug);
   const name = bidang?.name ?? 'Bidang';
   const desc = bidang?.desc ?? 'Pimpinan Komisariat IMM Fakultas Teknik';
 

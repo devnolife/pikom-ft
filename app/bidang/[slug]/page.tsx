@@ -1,10 +1,7 @@
 import { BidangDetailClient } from '@/components/landing/bidang-detail-client';
 import { getLandingAsset } from '@/lib/landing-assets';
+import { getBidangBySlug } from '@/lib/landing-content';
 
-/**
- * Server Component: fetch foto ketua & sekretaris untuk bidang ini,
- * lalu render UI client. Konten tekstual tetap dari `app/data/bidang.ts`.
- */
 export const dynamic = 'force-dynamic';
 
 export default async function BidangPage({
@@ -13,13 +10,15 @@ export default async function BidangPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [ketua, sekretaris] = await Promise.all([
+  const [bidang, ketua, sekretaris] = await Promise.all([
+    getBidangBySlug(slug),
     getLandingAsset(`bidang.${slug}.ketua`),
     getLandingAsset(`bidang.${slug}.sekretaris`),
   ]);
   return (
     <BidangDetailClient
       slug={slug}
+      bidang={bidang}
       ketuaImg={ketua?.url ?? null}
       sekretarisImg={sekretaris?.url ?? null}
     />

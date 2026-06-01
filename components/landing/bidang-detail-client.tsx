@@ -5,23 +5,23 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { CheckCircle2, Clock, Home, ChevronRight, Users } from 'lucide-react';
 
-import { bidangDetail } from '../../app/data/bidang';
 import { BackButton } from '@/components/landing/back-button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { DecorativeBlobs } from '@/components/landing/decorative-blobs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { CommandPalette } from '@/components/landing/command-palette';
 import { initialsDataUrl } from '@/lib/initials-placeholder';
+import { resolveBidangIcon } from '@/lib/landing-icons';
+import type { LandingBidangData } from '@/lib/landing-content';
 
 interface BidangDetailClientProps {
   slug: string;
+  bidang: LandingBidangData | null;
   ketuaImg?: string | null;
   sekretarisImg?: string | null;
 }
 
-export function BidangDetailClient({ slug, ketuaImg, sekretarisImg }: BidangDetailClientProps) {
-  const bidang = bidangDetail.find((b) => b.slug === slug);
-
+export function BidangDetailClient({ slug, bidang, ketuaImg, sekretarisImg }: BidangDetailClientProps) {
   if (!bidang) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg text-fg px-6">
@@ -44,7 +44,9 @@ export function BidangDetailClient({ slug, ketuaImg, sekretarisImg }: BidangDeta
     );
   }
 
-  const Icon = bidang.icon;
+  const Icon = resolveBidangIcon(bidang.icon);
+  const ketuaNama = bidang.ketua ?? '—';
+  const sekretarisNama = bidang.sekretaris ?? '—';
   const totalProker = bidang.prokerDirencanakan.length + bidang.prokerTerlaksana.length;
   const progressPercent =
     totalProker === 0 ? 0 : Math.round((bidang.prokerTerlaksana.length / totalProker) * 100);
@@ -124,12 +126,12 @@ export function BidangDetailClient({ slug, ketuaImg, sekretarisImg }: BidangDeta
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-8">
             {[
-              { role: 'Ketua Bidang', person: bidang.ketua, img: ketuaImg },
-              { role: 'Sekretaris Bidang', person: bidang.sekretaris, img: sekretarisImg },
+              { role: 'Ketua Bidang', nama: ketuaNama, img: ketuaImg },
+              { role: 'Sekretaris Bidang', nama: sekretarisNama, img: sekretarisImg },
             ].map((item, i) => {
               const src = item.img && item.img.trim().length > 0
                 ? item.img
-                : initialsDataUrl(item.person.nama, { variant: 'portrait' });
+                : initialsDataUrl(item.nama, { variant: 'portrait' });
               const isLocal = src.startsWith('/') || src.startsWith('data:');
               return (
               <motion.div
@@ -142,7 +144,7 @@ export function BidangDetailClient({ slug, ketuaImg, sekretarisImg }: BidangDeta
               >
                 <Image
                   src={src}
-                  alt={item.person.nama}
+                  alt={item.nama}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -162,7 +164,7 @@ export function BidangDetailClient({ slug, ketuaImg, sekretarisImg }: BidangDeta
                     {item.role}
                   </span>
                   <h3 className="text-xl md:text-2xl font-bold leading-tight">
-                    {item.person.nama}
+                    {item.nama}
                   </h3>
                 </div>
               </motion.div>

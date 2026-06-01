@@ -38,6 +38,15 @@ enum TipeTransaksi {
   PENGELUARAN
 }
 
+enum LandingProkerStatus {
+  TERLAKSANA
+  DIRENCANAKAN
+}
+
+enum LandingMemberRole {
+  ANGGOTA
+}
+
 model User {
   id        String   @id @default(cuid())
   nim       String   @unique
@@ -72,6 +81,84 @@ model LandingAsset {
   uploader   User?    @relation("LandingAssetUploader", fields: [uploadedBy], references: [id], onDelete: SetNull)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+/// Key-value untuk teks bebas landing pages (hero tagline, about quote, stats label, dll).
+/// Admin dapat edit semua key dari satu UI.
+model LandingContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  /// Group untuk pengelompokan UI (Hero, About, Stats, Footer, ...).
+  groupName String   @default("Umum")
+  /// Label friendly untuk admin UI.
+  label     String?
+  /// Apakah value adalah long-form text (gunakan textarea di admin).
+  multiline Boolean  @default(false)
+  /// Urutan tampil di group.
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+/// Pimpinan inti komisariat (5 entry default: Ketua Umum, Sekum, Bendum, Ben1, Ben2).
+model LandingPimpinan {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  role      String?
+  nama      String
+  featured  Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Bidang organisasi. Detail page menampilkan struktur + proker dari sini.
+model LandingBidang {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  /// Nama icon Lucide (mis. "Network", "Users").
+  icon      String   @default("Sparkles")
+  desc      String
+  ketua     String?
+  sekretaris String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  anggota LandingBidangAnggota[]
+  proker  LandingProker[]
+}
+
+model LandingBidangAnggota {
+  id       String @id @default(cuid())
+  bidangId String
+  nama     String
+  order    Int    @default(0)
+
+  bidang LandingBidang @relation(fields: [bidangId], references: [id], onDelete: Cascade)
+}
+
+model LandingProker {
+  id       String              @id @default(cuid())
+  bidangId String
+  title    String
+  status   LandingProkerStatus
+  order    Int                 @default(0)
+
+  bidang LandingBidang @relation(fields: [bidangId], references: [id], onDelete: Cascade)
+}
+
+/// Periode kepengurusan sebelumnya (timeline jejak kepemimpinan).
+model LandingPeriode {
+  id      String @id @default(cuid())
+  periode String
+  ketua   String
+  order   Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Progress {

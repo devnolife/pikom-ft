@@ -1,13 +1,21 @@
 import { LandingPageClient } from '@/components/landing/landing-page-client';
 import { getLandingAssetMap } from '@/lib/landing-assets';
+import { getLandingPageData } from '@/lib/landing-content';
 
-/**
- * Server Component: fetch semua LandingAsset sekali, lalu render UI client.
- * Asset di-upload via /dashboard/admin/landing.
- */
 export const dynamic = 'force-dynamic';
 
 export default async function LandingPage() {
-  const assets = await getLandingAssetMap();
-  return <LandingPageClient assets={assets} />;
+  const [assets, data] = await Promise.all([
+    getLandingAssetMap(),
+    getLandingPageData(),
+  ]);
+  return (
+    <LandingPageClient
+      assets={assets}
+      pimpinan={data.pimpinan}
+      bidang={data.bidang}
+      periode={data.periode}
+      content={data.content}
+    />
+  );
 }

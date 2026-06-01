@@ -233,16 +233,17 @@ export default function LoginPage() {
                   }}
                   placeholder="Masukkan password"
                   disabled={loading}
-                  className="h-11 bg-surface/60 border-border pr-10"
+                  className="h-11 bg-surface/60 border-border pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-fg-muted hover:text-fg transition-colors"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 inline-flex items-center gap-1.5 px-2 h-8 rounded-md bg-bg-alt/80 border border-border/60 text-fg hover:text-accent hover:border-accent transition-colors font-mono text-[10px] uppercase tracking-[0.15em]"
                   aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                  tabIndex={-1}
+                  aria-pressed={showPassword}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                  <span className="hidden sm:inline">{showPassword ? 'Sembunyikan' : 'Lihat'}</span>
                 </button>
               </div>
             </FormField>

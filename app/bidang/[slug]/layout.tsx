@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { bidangDetail } from '@/app/data/bidang';
+import { getBidangBySlug } from '@/lib/landing-content';
 
 export async function generateMetadata({
   params,
@@ -7,7 +7,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const bidang = bidangDetail.find((b) => b.slug === slug);
+  const bidang = await getBidangBySlug(slug);
 
   if (!bidang) {
     return {
@@ -32,10 +32,6 @@ export async function generateMetadata({
       description,
     },
   };
-}
-
-export async function generateStaticParams() {
-  return bidangDetail.map((b) => ({ slug: b.slug }));
 }
 
 export default function BidangLayout({ children }: { children: React.ReactNode }) {

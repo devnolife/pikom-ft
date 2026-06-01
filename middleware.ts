@@ -12,6 +12,7 @@ export default auth((req) => {
     publicPaths.some(p => pathname === p || pathname.startsWith(p + '/')) ||
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/api/health') ||
+    pathname.startsWith('/api/public') ||
     pathname.startsWith('/_next') ||
     pathname.includes('.')
   ) {
