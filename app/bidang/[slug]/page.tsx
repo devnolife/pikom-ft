@@ -2,7 +2,8 @@ import { BidangDetailClient } from '@/components/landing/bidang-detail-client';
 import { getLandingAsset } from '@/lib/landing-assets';
 import { getBidangBySlug } from '@/lib/landing-content';
 
-export const dynamic = 'force-dynamic';
+// Di-cache + revalidasi on-demand dari admin (revalidatePath('/', 'layout')).
+export const revalidate = 3600;
 
 export default async function BidangPage({
   params,

@@ -2,7 +2,10 @@ import { LandingPageClient } from '@/components/landing/landing-page-client';
 import { getLandingAssetMap } from '@/lib/landing-assets';
 import { getLandingPageData } from '@/lib/landing-content';
 
-export const dynamic = 'force-dynamic';
+// Halaman di-cache dan hanya di-render ulang saat admin mengedit
+// (lib/actions/landing.ts memanggil revalidatePath('/', 'layout')).
+// revalidate menjadi fallback berbasis waktu (1 jam) bila DB diubah langsung.
+export const revalidate = 3600;
 
 export default async function LandingPage() {
   const [assets, data] = await Promise.all([
