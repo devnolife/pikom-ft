@@ -1,15 +1,22 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, Bricolage_Grotesque, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import './globals.css';
 import { ThemeProvider } from './theme-provider';
 import { AuthProvider } from './providers';
 import { cn } from '@/lib/utils';
 
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-sans-jakarta',
   display: 'swap',
+});
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-display-bricolage',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -38,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="id"
       data-theme="classic"
-      className={cn('scroll-smooth', inter.variable, jetbrainsMono.variable)}
+      className={cn('scroll-smooth', jakarta.variable, bricolage.variable, jetbrainsMono.variable)}
       suppressHydrationWarning
     >
       <head>

@@ -43,6 +43,8 @@ const nextConfig: NextConfig = {
   transpilePackages: ['motion'],
   experimental: {
     viewTransition: true,
+    // Tree-shaking lebih agresif untuk library besar → bundle JS lebih kecil.
+    optimizePackageImports: ['lucide-react', 'motion'],
   },
   async headers() {
     return [

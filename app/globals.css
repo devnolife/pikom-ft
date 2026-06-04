@@ -175,7 +175,8 @@
    sehingga utility ikut berganti saat data-theme berubah.
    ──────────────────────────────────────────────────────────── */
 @theme inline {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-bricolage), var(--font-sans-jakarta), ui-sans-serif, sans-serif;
   --font-mono: var(--font-mono-jetbrains), ui-monospace, monospace;
 
   /* shadcn tokens */
@@ -233,6 +234,13 @@
     background-color: var(--color-bg);
     color: var(--color-text);
     transition: background-color 0.35s ease, color 0.35s ease;
+  }
+
+  /* Heading memakai display font (Bricolage Grotesque) untuk karakter kuat
+     pada judul besar uppercase. Body tetap Plus Jakarta Sans. */
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-feature-settings: 'ss01', 'ss02';
   }
 
   /* Focus ring konsisten untuk semua elemen interaktif */
