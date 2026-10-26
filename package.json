@@ -6,7 +6,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "dev": "next dev -p 3077",
+    "dev": "next dev --turbopack -p 3077",
     "build": "prisma generate && next build",
     "postinstall": "prisma generate",
     "start": "next start -p 3077",
